@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Tests", "Order
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Api", "OrderService.Api\OrderService.Api.csproj", "{5B49A991-3D08-48A2-B30D-FE9F25334ADD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{D86FB540-E507-4AFB-83EF-CDFC1B02B410}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -108,6 +110,10 @@ Global
 		{5B49A991-3D08-48A2-B30D-FE9F25334ADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B49A991-3D08-48A2-B30D-FE9F25334ADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B49A991-3D08-48A2-B30D-FE9F25334ADD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D86FB540-E507-4AFB-83EF-CDFC1B02B410}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D86FB540-E507-4AFB-83EF-CDFC1B02B410}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D86FB540-E507-4AFB-83EF-CDFC1B02B410}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D86FB540-E507-4AFB-83EF-CDFC1B02B410}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9120A140-591D-434A-8091-7B5566730F48} = {5BB9AB1E-D335-4D4B-9E5F-DA250999DD19}
