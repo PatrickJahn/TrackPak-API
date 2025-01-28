@@ -1,6 +1,18 @@
 @UserService.Api_HostAddress = http://localhost:5218
 
-GET {{UserService.Api_HostAddress}}/weatherforecast/
+GET  http://localhost:5218/user/0194aea4-a386-760f-9999-763b2ddc1ad9
 Accept: application/json
 
 ###
+
+
+POST http://localhost:5218/post/
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "phoneNumber": "20111022",
+  "email": "john@doe.dk"
+}

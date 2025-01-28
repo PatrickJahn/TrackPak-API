@@ -1,5 +1,11 @@
 # TrackPak-API
 
+## Running a service locally 
+To run a service locally you have to setup the DB first. 
+To do this you can run the script in the service Infrastructure: 
+- dbSetupScript.sh
+
+This will create the services DB(s) and a DB user.
 
 ## Repository Structure
 ```

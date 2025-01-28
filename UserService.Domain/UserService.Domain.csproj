@@ -10,8 +10,4 @@
       <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="enums\" />
-    </ItemGroup>
-
 </Project>
