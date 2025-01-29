@@ -87,11 +87,14 @@ public class BaseRepository<TEntity, TContext> : IBaseRepository<TEntity> where 
     }
 
     public async Task AddAsync(TEntity entity) {
+      entity.CreatedAt = DateTime.UtcNow;
+      entity.LastModifiedAt = DateTime.UtcNow;
       await _dbContext.Set<TEntity>().AddAsync(entity);
       await _dbContext.SaveChangesAsync();
     }
 
     public async Task Update(TEntity entity) {
+      entity.LastModifiedAt = DateTime.UtcNow;
       _dbContext.Set<TEntity>().Update(entity);
       await _dbContext.SaveChangesAsync();
     }

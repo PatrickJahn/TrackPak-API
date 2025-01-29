@@ -42,7 +42,8 @@ public class LocationService: ILocationService
             City = model.City,
             AddressLine = model.AddressLine,
             PostalCode = model.PostalCode,
-            GeoLocation = geoLocation
+            GeoLocation = geoLocation,
+            
         };
 
         await _locationRepo.AddAsync(location);

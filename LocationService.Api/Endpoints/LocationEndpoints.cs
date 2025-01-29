@@ -26,8 +26,5 @@ public static class LocationEndpoints
         });
 
         
-        
-        
-
     }
 }
