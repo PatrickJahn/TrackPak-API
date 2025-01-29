@@ -1,6 +1,6 @@
 namespace Shared.Models;
 
-public class CreateLocationModel
+public class CreateLocationRequestModel
 {
     public string Country { get; set; }
     public string City { get; set; }

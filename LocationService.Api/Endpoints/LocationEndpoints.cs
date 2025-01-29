@@ -13,7 +13,7 @@ public static class LocationEndpoints
             return Results.Ok(location);
         });
         
-        app.MapPost("location", async (CreateLocationModel locationModel, ILocationService service) =>
+        app.MapPost("location", async (CreateLocationRequestModel locationModel, ILocationService service) =>
         {
             var location = await service.CreateLocationAsync(locationModel);
             return Results.Ok(location.Id);

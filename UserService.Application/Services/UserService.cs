@@ -1,4 +1,5 @@
 using Shared.Models;
+using Shared.Services;
 using UserService.Application.Interfaces;
 using UserService.Application.Models;
 using UserService.Application.Repositories;
@@ -9,10 +10,12 @@ namespace UserService.Application.Services;
 public class UserService: IUserService
 {
     private readonly IUserRepository _userRepo;
+    private readonly ILocationServiceClient _locationServiceClient;
 
-    public UserService(IUserRepository userRepo)
+    public UserService(IUserRepository userRepo, ILocationServiceClient locationServiceClient)
     {
         _userRepo = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
+        _locationServiceClient = locationServiceClient ?? throw new ArgumentNullException(nameof(locationServiceClient));
     }
 
     public async Task<User> GetUserByIdAsync(Guid userId)
@@ -47,20 +50,33 @@ public class UserService: IUserService
     public async Task CreateUser(CreateUserModel userModel)
     {
         
-        
-        // TODO: Call Location Service to add new Location / Get Location Id - WITH A FIRE AND HOPE 
-        // IF IT FAILS PUBLISH AND EVENT FOR UserCreatedWithoutLocation
-        // UserService Should subscribe to Event Send from locationService, to set Location Id
+        var locationId = await CreateLocation(userModel.Location);
         
          await _userRepo.AddAsync(new User
          {
              PhoneNumber = userModel.PhoneNumber,
              Email = userModel.Email,
-             CreatedAt = DateTime.UtcNow,
              FirstName =  userModel.FirstName,
-             LastName = userModel.FirstName,
-             LocationId = null
+             LastName = userModel.LastName,
+             LocationId = locationId
          });
+    }
+
+
+    private async Task<Guid?> CreateLocation(CreateLocationRequestModel locationModel)
+    {
+        
+        // TODO: Implement circuit breaker pattern. When open - send Message event instead of calling api. 
+        try
+        {
+           var locationId = await _locationServiceClient.CreateLocationAsync(locationModel);
+           return locationId;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
     }
     
     

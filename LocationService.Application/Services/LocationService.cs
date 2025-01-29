@@ -30,18 +30,18 @@ public class LocationService: ILocationService
     }
 
 
-    public async Task<Location> CreateLocationAsync(CreateLocationModel model)
+    public async Task<Location> CreateLocationAsync(CreateLocationRequestModel requestModel)
     {
         
-        var fullAddress = $"{model.AddressLine}, {model.City}, {model.Country}, {model.PostalCode}";
+        var fullAddress = $"{requestModel.AddressLine}, {requestModel.City}, {requestModel.Country}, {requestModel.PostalCode}";
         var geoLocation = await _geocodingService.GetGeoLocationAsync(fullAddress);
 
         var location = new Location
         {
-            Country = model.Country,
-            City = model.City,
-            AddressLine = model.AddressLine,
-            PostalCode = model.PostalCode,
+            Country = requestModel.Country,
+            City = requestModel.City,
+            AddressLine = requestModel.AddressLine,
+            PostalCode = requestModel.PostalCode,
             GeoLocation = geoLocation,
             
         };
