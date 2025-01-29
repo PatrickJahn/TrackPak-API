@@ -1,6 +1,6 @@
-namespace Shared.Entities;
+namespace Shared.Models;
 
-public class Address
+public class CreateLocationModel
 {
     public string Country { get; set; }
     public string City { get; set; }

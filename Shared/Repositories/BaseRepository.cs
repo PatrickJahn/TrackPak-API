@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using Shared.Entities;
+using Shared.Models;
 using Shared.Interfaces;
 
 namespace Shared.Repositories;
