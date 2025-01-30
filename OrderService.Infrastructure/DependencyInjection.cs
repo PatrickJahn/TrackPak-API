@@ -17,7 +17,7 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString("Postgres")));
 
         services.AddScoped<IOrderRepository, OrderRepository>();
-        
+
         // Ensure migrations are applied
         // Ensure migrations are applied in non-production environments
         using (var serviceProvider = services.BuildServiceProvider())

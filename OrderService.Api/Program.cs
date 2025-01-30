@@ -1,5 +1,7 @@
 
 
+using OrderService.Api.Endpoints;
+using OrderService.Application.Interfaces;
 using OrderService.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddInfrastructure(builder.Configuration);
-// builder.Services.AddApplication();
+builder.Services.AddScoped<IOrderService, OrderService.Application.Services.OrderService>();
 
 var app = builder.Build();
 
@@ -20,5 +22,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//app.MapOrderEndpoints();
+app.MapOrderEndpoints();
 app.Run();
