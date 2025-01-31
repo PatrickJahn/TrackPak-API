@@ -18,6 +18,8 @@ public class MessageConsumerService : BackgroundService
     {
         await _messageBus.SubscribeAsync<UserLocationCreatedMessage>(MessageTopic.UserLocationCreated, message =>
         {
+            
+            // TODO: Call userService to update the users locationId - ooops add UserId to UserLocationCreatedMessage...
             Console.WriteLine($"[x] Received: {message.LocationId}");
         });
         
