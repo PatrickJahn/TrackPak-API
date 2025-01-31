@@ -14,5 +14,11 @@ Accept: application/json
   "firstName": "Test",
   "lastName": "Doe",
   "phoneNumber": "20111022",
-  "email": "john@doe.dk"
+  "email": "john@doe.dk",
+  "location": {
+    "country": "",
+    "city": "",
+    "postalCode": "",
+    "addressLine": ""
+  }
 }
