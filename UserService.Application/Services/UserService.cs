@@ -1,3 +1,7 @@
+using System.Net.Sockets;
+using Shared.Messaging;
+using Shared.Messaging.Messages;
+using Shared.Messaging.Topics;
 using Shared.Models;
 using Shared.Services;
 using UserService.Application.Interfaces;
@@ -11,11 +15,13 @@ public class UserService: IUserService
 {
     private readonly IUserRepository _userRepo;
     private readonly ILocationServiceClient _locationServiceClient;
+    private readonly IMessageBus _messageBus;
 
-    public UserService(IUserRepository userRepo, ILocationServiceClient locationServiceClient)
+    public UserService(IUserRepository userRepo, ILocationServiceClient locationServiceClient, IMessageBus messageBus)
     {
         _userRepo = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
         _locationServiceClient = locationServiceClient ?? throw new ArgumentNullException(nameof(locationServiceClient));
+        _messageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
     }
 
     public async Task<User> GetUserByIdAsync(Guid userId)
@@ -65,16 +71,24 @@ public class UserService: IUserService
 
     private async Task<Guid?> CreateLocation(CreateLocationRequestModel locationModel)
     {
-        
-        // TODO: Implement circuit breaker pattern. When open - send Message event instead of calling api. 
         try
         {
            var locationId = await _locationServiceClient.CreateLocationAsync(locationModel);
            return locationId;
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Console.WriteLine(e);
+            Console.WriteLine("LocationService is unreachable. Sending failure message to RabbitMQ...");
+        
+            _ = _messageBus.PublishAsync(MessageTopic.UserLocationCreationFailed,
+                new UserLocationCreationFailedMessage()
+                {
+                    City = locationModel.City,
+                    Country = locationModel.Country,
+                    PostalCode = locationModel.PostalCode,
+                    AddressLine = locationModel.AddressLine
+                });
+
             return null;
         }
     }
