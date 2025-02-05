@@ -15,4 +15,8 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\CompanyService.Domain\CompanyService.Domain.csproj" />
+    </ItemGroup>
+
 </Project>
