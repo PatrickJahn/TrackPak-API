@@ -10,4 +10,8 @@
       <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="9.0.1" />
+    </ItemGroup>
+
 </Project>
