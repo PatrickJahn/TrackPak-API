@@ -16,10 +16,10 @@ public class MessageConsumerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageBus.SubscribeAsync<UserLocationCreatedMessage>(MessageTopic.UserLocationCreated, message =>
+        await _messageBus.SubscribeAsync<UserLocationCreatedEvent>(MessageTopic.UserLocationCreated, message =>
         {
             
-            // TODO: Call userService to update the users locationId - ooops add UserId to UserLocationCreatedMessage...
+            // TODO: Call userService to update the users locationId - ooops add UserId to UserLocationCreatedEvent...
             Console.WriteLine($"[x] Received: {message.LocationId}");
         });
         

@@ -20,15 +20,15 @@ public class MessageConsumerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageBus.SubscribeAsync<UserLocationCreationFailedMessage>(
-            MessageTopic.UserLocationCreationFailed,
+        await _messageBus.SubscribeAsync<UserCreatedEvent>(
+            MessageTopic.UserLocationCreated,
              (message) =>
             {
-                 _ = HandleUserLocationCreationFailed(message);
+                 _ = HandleUserCreatedEvent(message);
             });
     }
 
-    private async Task HandleUserLocationCreationFailed(UserLocationCreationFailedMessage message)
+    private async Task HandleUserCreatedEvent(UserCreatedEvent message)
     {
         using var scope = _serviceScopeFactory.CreateScope(); 
         var locationService = scope.ServiceProvider.GetRequiredService<ILocationService>(); 
@@ -37,10 +37,10 @@ public class MessageConsumerService : BackgroundService
             var locationId = await locationService.CreateLocationAsync(
                 new CreateLocationRequestModel()
                 {
-                    City = message.City,
-                    AddressLine = message.AddressLine,
-                    PostalCode = message.PostalCode,
-                    Country = message.Country
+                    City = message.Location.City,
+                    AddressLine = message.Location.AddressLine,
+                    PostalCode = message.Location.PostalCode,
+                    Country = message.Location.Country
                 });
             
             await _messageBus.PublishAsync(MessageTopic.UserLocationCreated, locationId);

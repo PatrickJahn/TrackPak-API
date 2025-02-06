@@ -25,6 +25,7 @@ public static class OrderEndpoints
         IOrderService orderService,
         CancellationToken cancellationToken)
     {
+        // TODO: Create order dto for request
         var createdOrder = await orderService.CreateOrderAsync(order, cancellationToken);
         return createdOrder != null ? TypedResults.Created($"/orders/{createdOrder.Id}", createdOrder) 
                                     : TypedResults.BadRequest("Failed to create order.");
@@ -56,6 +57,8 @@ public static class OrderEndpoints
         IOrderService orderService,
         CancellationToken cancellationToken)
     {
+        // TODO: Create dto request for updateOrder
+        
         var updated = await orderService.UpdateOrderAsync(orderId, updatedOrder, cancellationToken);
         return updated ? TypedResults.NoContent() : TypedResults.NotFound();
     }

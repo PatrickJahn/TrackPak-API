@@ -31,13 +31,16 @@ public class UserService: IUserService
 
     public async Task<User> UpdateUserAsync(Guid userId,UpdateUserModel userModel)
     {
+        
+        // TODO:  Check if user with email or phone exists
+        
         var user = await _userRepo.GetByIdAsync(userId);
 
         user.FirstName = userModel.FirstName;
         user.Email = userModel.Email;
         user.LastName = userModel.LastName;
         user.PhoneNumber = userModel.PhoneNumber;
-
+        
         await _userRepo.Update(user);
 
         return user;
@@ -45,6 +48,7 @@ public class UserService: IUserService
 
     public Task<User> UpdateUserLocationAsync(Guid userId, UpdateLocationModel locationModel)
     {
+        // TODO: Implement
         throw new NotImplementedException();
     }
 
@@ -56,7 +60,8 @@ public class UserService: IUserService
     public async Task CreateUser(CreateUserModel userModel)
     {
         
-        var locationId = await CreateLocation(userModel.Location);
+        
+        // TODO: Check if user with same email or phone exists
         
          await _userRepo.AddAsync(new User
          {
@@ -64,34 +69,27 @@ public class UserService: IUserService
              Email = userModel.Email,
              FirstName =  userModel.FirstName,
              LastName = userModel.LastName,
-             LocationId = locationId
+             LocationId = null
          });
+         
+         PublishUserCreatedEvent(userModel);
     }
 
 
-    private async Task<Guid?> CreateLocation(CreateLocationRequestModel locationModel)
+    private void PublishUserCreatedEvent(CreateUserModel model)
     {
-        try
-        {
-           var locationId = await _locationServiceClient.CreateLocationAsync(locationModel);
-           return locationId;
-        }
-        catch (Exception)
-        {
-            Console.WriteLine("LocationService is unreachable. Sending failure message to RabbitMQ...");
-        
-            _ = _messageBus.PublishAsync(MessageTopic.UserLocationCreationFailed,
-                new UserLocationCreationFailedMessage()
+       
+            _messageBus.PublishAsync(MessageTopic.UserCreated,
+                new UserCreatedEvent()
                 {
-                    City = locationModel.City,
-                    Country = locationModel.Country,
-                    PostalCode = locationModel.PostalCode,
-                    AddressLine = locationModel.AddressLine
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Location = model.Location
                 });
 
-            return null;
-        }
     }
-    
-    
 }
+    
+    
