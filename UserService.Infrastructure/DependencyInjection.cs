@@ -23,12 +23,6 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString("Postgres")));
        
         
-        // Other microservice clients
-        services.AddHttpClient<ILocationServiceClient, LocationServiceClient>(client =>
-        {
-            client.BaseAddress = new Uri("http://locationservice-api"); // Replace with actual URL
-        });
-        
         // ServiceBus config (RabbitMq)
         if (configuration.GetSection("ServiceBus").GetValue<bool>("useMock"))
         {
@@ -41,14 +35,11 @@ public static class DependencyInjection
         }
         services.AddHostedService<MessageConsumerService>(); // Background listening service:))
 
-     
         
-        
-        services.AddScoped<IUserRepository, UserRepository>();
+        // Repositories
         services.AddScoped<IUserRepository, UserRepository>();
 
         // Ensure migrations are applied
-        // Ensure migrations are applied in non-production environments
         using (var serviceProvider = services.BuildServiceProvider())
         {
             using (var scope = serviceProvider.CreateScope())

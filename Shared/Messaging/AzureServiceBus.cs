@@ -6,14 +6,9 @@ using Shared.Messaging.Topics;
 namespace Shared.Messaging;
 
 
-public class AzureServiceBus : IMessageBus
+public class AzureServiceBus(string connectionString) : IMessageBus
 {
-    private readonly ServiceBusClient _client;
-
-    public AzureServiceBus(string connectionString)
-    {
-        _client = new ServiceBusClient(connectionString);
-    }
+    private readonly ServiceBusClient _client = new ServiceBusClient(connectionString);
 
     public async Task PublishAsync<T>(MessageTopic topic, T message)
     {
