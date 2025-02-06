@@ -1,4 +1,4 @@
-namespace Shared.Messaging.Messages;
+namespace Shared.Messaging.Events.Location;
 
 public class CompanyLocationCreatedEvent
 {

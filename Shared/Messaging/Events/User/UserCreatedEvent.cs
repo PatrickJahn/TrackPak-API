@@ -1,6 +1,6 @@
 using Shared.Models;
 
-namespace Shared.Messaging.Messages;
+namespace Shared.Messaging.Events.User;
 
 public class UserCreatedEvent
 {

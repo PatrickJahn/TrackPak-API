@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 using Shared.Messaging;
-using Shared.Messaging.Messages;
+using Shared.Messaging.Events.Location;
 using Shared.Messaging.Topics;
 
 namespace UserService.Infrastructure.Messaging;

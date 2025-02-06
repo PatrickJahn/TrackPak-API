@@ -2,7 +2,7 @@ using LocationService.Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shared.Messaging;
-using Shared.Messaging.Messages;
+using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
 using Shared.Models;
 

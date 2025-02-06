@@ -1,6 +1,6 @@
 using System.Net.Sockets;
 using Shared.Messaging;
-using Shared.Messaging.Messages;
+using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
 using Shared.Models;
 using Shared.Services;

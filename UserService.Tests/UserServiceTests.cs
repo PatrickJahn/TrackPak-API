@@ -5,7 +5,7 @@ using Xunit;
 using Moq;
 using FluentAssertions;
 using Shared.Messaging;
-using Shared.Messaging.Messages;
+using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
 using Shared.Models;
 using Shared.Services;
