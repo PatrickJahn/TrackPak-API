@@ -26,9 +26,9 @@ public enum MessageTopic
 
     
     // Company Events
-    CompanyCreated,
-    CompanyUpdated,
-    CompanyLocationUpdated,
+    CompanyCreated = 50,
+    CompanyUpdated = 51,
+    CompanyLocationUpdated = 52,
 
 
 
