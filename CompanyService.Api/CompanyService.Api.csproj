@@ -9,12 +9,22 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="9.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1"/>
+
     </ItemGroup>
 
     <ItemGroup>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\CompanyService.Application\CompanyService.Application.csproj" />
+      <ProjectReference Include="..\CompanyService.Domain\CompanyService.Domain.csproj" />
+      <ProjectReference Include="..\CompanyService.Infrastructure\CompanyService.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
