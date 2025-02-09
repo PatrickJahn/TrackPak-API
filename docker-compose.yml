@@ -1,0 +1,129 @@
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"   # RabbitMQ message broker port
+      - "15672:15672" # RabbitMQ management UI
+
+  company-service:
+    image: trackpak-companyservice
+    build:
+      context: .
+      dockerfile: CompanyService.Api/Dockerfile
+    depends_on:
+      - rabbitmq
+      - company-db
+    deploy:
+      replicas: 2  # Two replicas for x-axis scaling
+      restart_policy:
+        condition: on-failure
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Postgres=Host=company-db;Port=5432;Database=trackpak-companydb;Username=developer;Password=trackPak_dev_password
+  
+  location-service:
+    image: trackpak-locationservice
+    build:
+      context: .
+      dockerfile: LocationService.Api/Dockerfile
+    depends_on:
+      - rabbitmq
+      - location-db
+    deploy:
+      replicas: 2  # Two replicas for x-axis scaling
+      restart_policy:
+        condition: on-failure
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Postgres=Host=location-db;Port=5432;Database=trackpak-locationdb;Username=developer;Password=trackPak_dev_password
+  
+  order-service:
+    image: trackpak-orderservice
+    build:
+      context: .
+      dockerfile: OrderService.Api/Dockerfile
+    depends_on:
+      - rabbitmq
+      - order-db
+    deploy:
+      replicas: 2  # Two replicas for x-axis scaling
+      restart_policy:
+        condition: on-failure
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Postgres=Host=order-db;Port=5432;Database=trackpak-orderdb;Username=developer;Password=trackPak_dev_password
+  
+  User-service:
+    image: trackpak-userservice
+    build:
+      context: .
+      dockerfile: UserService.Api/Dockerfile
+    depends_on:
+      - rabbitmq
+      - user-db
+    deploy:
+      replicas: 2  # Two replicas for x-axis scaling
+      restart_policy:
+        condition: on-failure
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Postgres=Host=user-db;Port=5432;Database=trackpak-userdb;Username=developer;Password=trackPak_dev_password
+  
+  company-db:
+    image: postgres:15
+    container_name: company-db
+    restart: always
+    environment:
+      POSTGRES_USER: developer
+      POSTGRES_PASSWORD: trackPak_dev_password
+      POSTGRES_DB: trackpak-companydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - company-db-data:/var/lib/postgresql/data
+      
+  location-db:
+    image: postgres:15
+    container_name: location-db
+    restart: always
+    environment:
+      POSTGRES_USER: developer
+      POSTGRES_PASSWORD: trackPak_dev_password
+      POSTGRES_DB: trackpak-locationdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - location-db-data:/var/lib/postgresql/data
+    
+  order-db:
+    image: postgres:15
+    container_name: order-db
+    restart: always
+    environment:
+      POSTGRES_USER: developer
+      POSTGRES_PASSWORD: trackPak_dev_password
+      POSTGRES_DB: trackpak-orderdb
+    ports:
+      - "5434:5432"
+    volumes:
+      - order-db-data:/var/lib/postgresql/data
+  
+  user-db:
+    image: postgres:15
+    container_name: user-db
+    restart: always
+    environment:
+      POSTGRES_USER: developer
+      POSTGRES_PASSWORD: trackPak_dev_password
+      POSTGRES_DB: trackpak-userdb
+    ports:
+      - "5435:5432"
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+        
+  
+volumes:
+  company-db-data:
+  location-db-data:
+  order-db-data:
+  user-db-data:
