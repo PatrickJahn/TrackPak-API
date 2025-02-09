@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 using Xunit;
 using Moq;
 using FluentAssertions;
+using Shared.Messaging;
+using Shared.Messaging.Events.User;
+using Shared.Messaging.Topics;
 using Shared.Models;
 using Shared.Services;
 using UserService.Application.Models;
@@ -18,6 +21,7 @@ namespace UserService.Tests;
     {
         private readonly Mock<IUserRepository> _userRepoMock;
         private readonly Mock<ILocationServiceClient> _locationClientMock;
+        private readonly Mock<IMessageBus> _messageBusMock;
 
         private readonly UserService.Application.Services.UserService _userService;
 
@@ -25,8 +29,9 @@ namespace UserService.Tests;
         {
             _userRepoMock = new Mock<IUserRepository>();
             _locationClientMock = new Mock<ILocationServiceClient>();
+            _messageBusMock = new Mock<IMessageBus>();
 
-            _userService = new UserService.Application.Services.UserService(_userRepoMock.Object, _locationClientMock.Object );
+            _userService = new UserService.Application.Services.UserService(_userRepoMock.Object, _locationClientMock.Object, _messageBusMock.Object);
         }
 
         [Fact]
@@ -127,8 +132,10 @@ namespace UserService.Tests;
                 u.PhoneNumber == "123456789")), Times.Once);
         }
         
+       
+        
         [Fact]
-        public async Task CreateUser_ShouldContinue_IfLocationServiceIsDown()
+        public async Task CreateUser_ShouldPublishMessage_IfLocationServiceIsDown()
         {
             // Arrange
             var createUserModel = new CreateUserModel
@@ -137,25 +144,36 @@ namespace UserService.Tests;
                 LastName = "Johnson",
                 Email = "alice@example.com",
                 PhoneNumber = "123456789",
-                Location = new CreateLocationRequestModel(){City = "New York", Country = "USA", AddressLine = "New York, USA", PostalCode = "12345"}
+                Location = new CreateLocationRequestModel()
+                {
+                    City = "New York",
+                    Country = "USA",
+                    AddressLine = "New York, USA",
+                    PostalCode = "12345"
+                }
             };
 
             _locationClientMock.Setup(repo => repo.CreateLocationAsync(It.IsAny<CreateLocationRequestModel>()))
                 .Throws(new Exception());
-            
+
             _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
+                .Returns(Task.CompletedTask);
+
+            _messageBusMock.Setup(bus => bus.PublishAsync(MessageTopic.UserCreated, It.IsAny<UserCreatedEvent>()))
                 .Returns(Task.CompletedTask);
 
             // Act
             await _userService.CreateUser(createUserModel);
 
-            // Assert - repo should still be called and locationId set to null 
-            _userRepoMock.Verify(repo => repo.AddAsync(It.Is<User>(u => 
-                u.FirstName == "Alice" && 
-                u.LastName == "Johnson" && 
-                u.Email == "alice@example.com" &&
-                u.PhoneNumber == "123456789" && 
-                u.LocationId == null)), Times.Once);
+            // Assert
+            _messageBusMock.Verify(bus => bus.PublishAsync(
+                MessageTopic.UserCreated,
+                It.Is<UserCreatedEvent>(msg => 
+                    msg.Location.City == "New York" &&
+                    msg.Location.Country == "USA" &&
+                    msg.Location.AddressLine == "New York, USA" &&
+                    msg.Location.PostalCode == "12345"
+                )), Times.Once);
         }
     }
 

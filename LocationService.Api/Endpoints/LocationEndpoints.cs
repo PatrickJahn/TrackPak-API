@@ -7,6 +7,9 @@ public static class LocationEndpoints
 {
     public static void MapLocationEndpoints(this IEndpointRouteBuilder app)
     {
+        
+        // TODO: Add GetOrCreateEndpoint
+        
         app.MapGet("location/{id}", async (Guid id, ILocationService service) =>
         {
             var location = await service.GetLocationByIdAsync(id);
@@ -21,8 +24,8 @@ public static class LocationEndpoints
         
         app.MapDelete("location/{id}", async (Guid id, ILocationService service) =>
         {
-            await service.DeleteLocationAsync(id); // Call delete method in service
-            return Results.NoContent(); // Return 204 No Content on successful deletion
+            await service.DeleteLocationAsync(id); 
+            return Results.Ok();
         });
 
         
