@@ -5,22 +5,24 @@ using Shared.Messaging.Topics;
 
 namespace UserService.Infrastructure.Messaging;
 
-public class MessageConsumerService : BackgroundService
+public class MessageConsumerService(
+    IMessageBus messageBus, 
+    IMessageHandler<UserLocationCreatedEvent> handler) : BackgroundService
 {
-    private readonly IMessageBus _messageBus;
-
-    public MessageConsumerService(IMessageBus messageBus)
-    {
-        _messageBus = messageBus;
-    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageBus.SubscribeAsync<UserLocationCreatedEvent>(MessageTopic.UserLocationCreated, message =>
+        await messageBus.SubscribeAsync<UserLocationCreatedEvent>(MessageTopic.UserLocationCreated, async message =>
         {
-            
-            // TODO: Call userService to update the users locationId - ooops add UserId to UserLocationCreatedEvent...
-            Console.WriteLine($"[x] Received: {message.LocationId}");
+            try
+            {
+                Console.WriteLine($"UserLocationCreatedEvent received: LocationId: {message.LocationId}, UserId: {message.UserId}");
+                await handler.HandleAsync(message, stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error handling message: {ex.Message}");
+            }
         });
         
     }

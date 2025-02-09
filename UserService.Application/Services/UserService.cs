@@ -14,14 +14,12 @@ namespace UserService.Application.Services;
 public class UserService: IUserService
 {
     private readonly IUserRepository _userRepo;
-    private readonly ILocationServiceClient _locationServiceClient;
-    private readonly IMessageBus _messageBus;
+    private readonly IUserEventPublisher _userEventPublisher;
 
-    public UserService(IUserRepository userRepo, ILocationServiceClient locationServiceClient, IMessageBus messageBus)
+    public UserService(IUserRepository userRepo, IUserEventPublisher userEventPublisher)
     {
         _userRepo = userRepo ?? throw new ArgumentNullException(nameof(userRepo));
-        _locationServiceClient = locationServiceClient ?? throw new ArgumentNullException(nameof(locationServiceClient));
-        _messageBus = messageBus ?? throw new ArgumentNullException(nameof(messageBus));
+        _userEventPublisher = userEventPublisher ?? throw new ArgumentNullException(nameof(userEventPublisher));
     }
 
     public async Task<User> GetUserByIdAsync(Guid userId)
@@ -72,24 +70,11 @@ public class UserService: IUserService
              LocationId = null
          });
          
-         PublishUserCreatedEvent(userModel);
+        await _userEventPublisher.PublishUserCreatedAsync(userModel);
     }
 
 
-    private void PublishUserCreatedEvent(CreateUserModel model)
-    {
-       
-            _messageBus.PublishAsync(MessageTopic.UserCreated,
-                new UserCreatedEvent()
-                {
-                    Email = model.Email,
-                    PhoneNumber = model.PhoneNumber,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Location = model.Location
-                });
-
-    }
+  
 }
     
     
