@@ -9,6 +9,7 @@ using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
 using Shared.Models;
 using Shared.Services;
+using UserService.Application.Interfaces;
 using UserService.Application.Models;
 using UserService.Application.Repositories;
 using UserService.Domain.entities;
@@ -20,18 +21,16 @@ namespace UserService.Tests;
     public class UserServiceTests
     {
         private readonly Mock<IUserRepository> _userRepoMock;
-        private readonly Mock<ILocationServiceClient> _locationClientMock;
-        private readonly Mock<IMessageBus> _messageBusMock;
+        private readonly Mock<IUserEventPublisher> _userEventPublisherMock;
 
         private readonly UserService.Application.Services.UserService _userService;
 
         public UserServiceTests()
         {
             _userRepoMock = new Mock<IUserRepository>();
-            _locationClientMock = new Mock<ILocationServiceClient>();
-            _messageBusMock = new Mock<IMessageBus>();
+            _userEventPublisherMock = new Mock<IUserEventPublisher>();
 
-            _userService = new UserService.Application.Services.UserService(_userRepoMock.Object, _locationClientMock.Object, _messageBusMock.Object);
+            _userService = new UserService.Application.Services.UserService(_userRepoMock.Object,  _userEventPublisherMock.Object);
         }
 
         [Fact]
@@ -116,7 +115,6 @@ namespace UserService.Tests;
                 Location = null
             };
 
-            var locationId = Guid.NewGuid();
 
             _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
                          .Returns(Task.CompletedTask);
@@ -132,49 +130,49 @@ namespace UserService.Tests;
                 u.PhoneNumber == "123456789")), Times.Once);
         }
         
-       
-        
         [Fact]
-        public async Task CreateUser_ShouldPublishMessage_IfLocationServiceIsDown()
+        public async Task CreateUser_Should_Call_AddAsync_And_PublishEvent()
         {
             // Arrange
-            var createUserModel = new CreateUserModel
+            var userModel = new CreateUserModel
             {
-                FirstName = "Alice",
-                LastName = "Johnson",
-                Email = "alice@example.com",
                 PhoneNumber = "123456789",
-                Location = new CreateLocationRequestModel()
-                {
-                    City = "New York",
-                    Country = "USA",
-                    AddressLine = "New York, USA",
-                    PostalCode = "12345"
-                }
+                Email = "test@example.com",
+                FirstName = "John",
+                LastName = "Doe",
+                Location = { }
             };
 
-            _locationClientMock.Setup(repo => repo.CreateLocationAsync(It.IsAny<CreateLocationRequestModel>()))
-                .Throws(new Exception());
-
-            _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
+            _userRepoMock
+                .Setup(repo => repo.AddAsync(It.IsAny<User>()))
                 .Returns(Task.CompletedTask);
 
-            _messageBusMock.Setup(bus => bus.PublishAsync(MessageTopic.UserCreated, It.IsAny<UserCreatedEvent>()))
+            _userEventPublisherMock
+                .Setup(pub => pub.PublishUserCreatedAsync(It.IsAny<CreateUserModel>()))
                 .Returns(Task.CompletedTask);
 
             // Act
-            await _userService.CreateUser(createUserModel);
+            await _userService.CreateUser(userModel);
 
             // Assert
-            _messageBusMock.Verify(bus => bus.PublishAsync(
-                MessageTopic.UserCreated,
-                It.Is<UserCreatedEvent>(msg => 
-                    msg.Location.City == "New York" &&
-                    msg.Location.Country == "USA" &&
-                    msg.Location.AddressLine == "New York, USA" &&
-                    msg.Location.PostalCode == "12345"
-                )), Times.Once);
+            _userRepoMock.Verify(repo => repo.AddAsync(It.Is<User>(u =>
+                u.Email == userModel.Email &&
+                u.PhoneNumber == userModel.PhoneNumber &&
+                u.FirstName == userModel.FirstName &&
+                u.LastName == userModel.LastName &&
+                u.LocationId == null)), Times.Once);
+
+            _userEventPublisherMock.Verify(pub => pub.PublishUserCreatedAsync(It.Is<CreateUserModel>(u =>
+                u.Email == userModel.Email &&
+                u.PhoneNumber == userModel.PhoneNumber &&
+                u.FirstName == userModel.FirstName &&
+                u.LastName == userModel.LastName &&
+                u.Location == userModel.Location)), Times.Once);
         }
+        
+       
+        
+    
     }
 
 
