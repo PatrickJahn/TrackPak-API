@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using CompanyService.Application.Interfaces;
+using CompanyService.Application.Models;
 using CompanyService.Domain.Entities;
 
 
@@ -20,7 +21,7 @@ public static class CompanyEndpoints
     }
 
     private static async Task<Results<Created<Company>, BadRequest<string>>> CreateCompanyAsync(
-        Company company,
+        CreateCompanyModel company,
         ICompanyService companyService,
         CancellationToken cancellationToken)
     {
@@ -30,7 +31,7 @@ public static class CompanyEndpoints
     }
 
     private static async Task<Results<Ok<Company>, NotFound>> GetCompanyByIdAsync(
-        string companyId,
+        Guid companyId,
         ICompanyService companyService,
         CancellationToken cancellationToken)
     {
@@ -47,8 +48,8 @@ public static class CompanyEndpoints
     }
 
     private static async Task<Results<NoContent, NotFound>> UpdateCompanyAsync(
-        string companyId,
-        Company updatedCompany,
+        Guid companyId,
+        UpdateCompanyModel updatedCompany,
         ICompanyService companyService,
         CancellationToken cancellationToken)
     {
@@ -57,7 +58,7 @@ public static class CompanyEndpoints
     }
 
     private static async Task<Results<NoContent, NotFound>> DeleteCompanyAsync(
-        string companyId,
+        Guid companyId,
         ICompanyService companyService,
         CancellationToken cancellationToken)
     {

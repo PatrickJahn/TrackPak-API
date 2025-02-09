@@ -3,20 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CompanyService.Infrastructure.DBContext;
 
-public class CompanyDbContext : DbContext
+public class CompanyDbContext(DbContextOptions<CompanyDbContext> options) : DbContext(options)
 {
-  public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options)
-  {
-  }
-
+  
   public DbSet<Company> Companies { get; set; }
-
-  protected override void OnModelCreating(ModelBuilder modelBuilder)
-  {
-    base.OnModelCreating(modelBuilder);
-
-    // Example of configuring an owned type, assuming Company has an Address object
-    modelBuilder.Entity<Company>()
-      .OwnsOne(c => c.Address);
-  }
+ 
 }

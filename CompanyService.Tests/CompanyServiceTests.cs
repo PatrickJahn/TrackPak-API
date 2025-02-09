@@ -5,100 +5,174 @@ using CompanyService.Application.Interfaces;
 using CompanyService.Domain.Entities;
 using Xunit;
 using System.Collections.Generic;
+using CompanyService.Application.Models;
+using CompanyService.Domain.Interfaces;
 
-namespace CompanyService.Tests
-{
-    public class CompanyServiceTests
+namespace CompanyService.Tests;
+
+public class CompanyServiceTests
     {
-        private readonly Mock<ICompanyService> _companyServiceMock;
+        
+       private readonly Mock<ICompanyRepository> _mockCompanyRepository;
+       private readonly Application.Services.CompanyService _companyService;
 
-        public CompanyServiceTests()
-        {
-            _companyServiceMock = new Mock<ICompanyService>();
-        }
-
-        [Fact]
-        public async Task CreateCompanyAsync_ShouldReturnCompany_WhenSuccess()
-        {
-            // Arrange
-            var newCompany = new Company { CompanyId = "1", Name = "Test Company" };
-            _companyServiceMock.Setup(x => x.CreateCompanyAsync(It.IsAny<Company>(), CancellationToken.None))
-                .ReturnsAsync(newCompany);
-
-            // Act
-            var result = await _companyServiceMock.Object.CreateCompanyAsync(newCompany, CancellationToken.None);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal("Test Company", result.Name);
-        }
-
-        [Fact]
-        public async Task GetCompanyByIdAsync_ShouldReturnCompany_WhenFound()
-        {
-            // Arrange
-            var company = new Company { CompanyId = "1", Name = "Test Company" };
-            _companyServiceMock.Setup(x => x.GetCompanyByIdAsync("1", CancellationToken.None))
-                .ReturnsAsync(company);
-
-            // Act
-            var result = await _companyServiceMock.Object.GetCompanyByIdAsync("1", CancellationToken.None);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal("Test Company", result.Name);
-        }
-
-        [Fact]
-        public async Task GetCompaniesAsync_ShouldReturnListOfCompanies()
-        {
-            // Arrange
-            var companies = new List<Company>
-            {
-                new Company { CompanyId = "1", Name = "Company 1" },
-                new Company { CompanyId = "2", Name = "Company 2" }
-            };
-
-            _companyServiceMock.Setup(x => x.GetCompaniesAsync(CancellationToken.None))
-                .ReturnsAsync(companies);
-
-            // Act
-            var result = await _companyServiceMock.Object.GetCompaniesAsync(CancellationToken.None);
-
-            // Assert
-            var companyList = result.ToList(); // Ensures the result is treated as a List
-            Assert.NotEmpty(companyList);
-            Assert.Equal(2, companyList.Count);
-        }
-
-
-        [Fact]
-        public async Task UpdateCompanyAsync_ShouldReturnTrue_WhenSuccess()
-        {
-            // Arrange
-            var updatedCompany = new Company { CompanyId = "1", Name = "Updated Company" };
-            _companyServiceMock.Setup(x => x.UpdateCompanyAsync("1", updatedCompany, CancellationToken.None))
-                .ReturnsAsync(true);
-
-            // Act
-            var result = await _companyServiceMock.Object.UpdateCompanyAsync("1", updatedCompany, CancellationToken.None);
-
-            // Assert
-            Assert.True(result);
-        }
-
-        [Fact]
-        public async Task DeleteCompanyAsync_ShouldReturnTrue_WhenSuccess()
-        {
-            // Arrange
-            _companyServiceMock.Setup(x => x.DeleteCompanyAsync("1", CancellationToken.None))
-                .ReturnsAsync(true);
-
-            // Act
-            var result = await _companyServiceMock.Object.DeleteCompanyAsync("1", CancellationToken.None);
-
-            // Assert
-            Assert.True(result);
-        }
+    public CompanyServiceTests()
+    {
+        _mockCompanyRepository = new Mock<ICompanyRepository>();
+        _companyService = new Application.Services.CompanyService(_mockCompanyRepository.Object);
     }
+
+    [Fact]
+    public async Task CreateCompanyAsync_ShouldReturnCreatedCompany()
+    {
+        // Arrange
+        var companyModel = new CreateCompanyModel
+        {
+            Name = "Test Company",
+            Cvr = "12345678",
+            BrandId = Guid.NewGuid().ToString()
+        };
+
+        Company capturedCompany = null!;
+        _mockCompanyRepository
+            .Setup(repo => repo.AddAsync(It.IsAny<Company>()))
+            .Callback<Company>(c => capturedCompany = c)
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _companyService.CreateCompanyAsync(companyModel);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(companyModel.Name, capturedCompany.Name);
+        Assert.Equal(companyModel.Cvr, capturedCompany.Cvr);
+        Assert.Equal(companyModel.BrandId, capturedCompany.BrandId);
+        Assert.Null(capturedCompany.LocationId);
+        Assert.True(capturedCompany.CreatedAt <= DateTime.UtcNow);
+        _mockCompanyRepository.Verify(repo => repo.AddAsync(It.IsAny<Company>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetCompanyByIdAsync_ShouldReturnCompany_WhenCompanyExists()
+    {
+        // Arrange
+        var companyId = Guid.NewGuid();
+        var company = new Company { Id = companyId, Name = "Test Company" };
+
+        _mockCompanyRepository
+            .Setup(repo => repo.GetOrDefaultByIdAsync(companyId))
+            .ReturnsAsync(company);
+
+        // Act
+        var result = await _companyService.GetCompanyByIdAsync(companyId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(companyId, result.Id);
+        _mockCompanyRepository.Verify(repo => repo.GetOrDefaultByIdAsync(companyId), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetCompanyByIdAsync_ShouldReturnNull_WhenCompanyDoesNotExist()
+    {
+        // Arrange
+        var companyId = Guid.NewGuid();
+
+        _mockCompanyRepository
+            .Setup(repo => repo.GetOrDefaultByIdAsync(companyId))
+            .ReturnsAsync((Company?)null);
+
+        // Act
+        var result = await _companyService.GetCompanyByIdAsync(companyId);
+
+        // Assert
+        Assert.Null(result);
+        _mockCompanyRepository.Verify(repo => repo.GetOrDefaultByIdAsync(companyId), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetCompaniesAsync_ShouldReturnListOfCompanies()
+    {
+        // Arrange
+        var companies = new List<Company>
+        {
+            new Company { Id = Guid.NewGuid(), Name = "Company A" },
+            new Company { Id = Guid.NewGuid(), Name = "Company B" }
+        };
+
+        _mockCompanyRepository
+            .Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(companies);
+
+        // Act
+        var result = await _companyService.GetCompaniesAsync();
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(2, result.Count());
+        _mockCompanyRepository.Verify(repo => repo.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateCompanyAsync_ShouldReturnTrue_WhenCompanyExists()
+    {
+        // Arrange
+        var companyId = Guid.NewGuid();
+        var existingCompany = new Company { Id = companyId, Name = "Old Name", Cvr = "1111", BrandId = Guid.NewGuid().ToString() };
+        var updatedCompany = new UpdateCompanyModel { Name = "New Name", Cvr = "2222", BrandId = Guid.NewGuid().ToString() };
+
+        _mockCompanyRepository
+            .Setup(repo => repo.GetByIdAsync(companyId))
+            .ReturnsAsync(existingCompany);
+
+        _mockCompanyRepository
+            .Setup(repo => repo.Update(It.IsAny<Company>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _companyService.UpdateCompanyAsync(companyId, updatedCompany);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(updatedCompany.Name, existingCompany.Name);
+        Assert.Equal(updatedCompany.Cvr, existingCompany.Cvr);
+        Assert.Equal(updatedCompany.BrandId, existingCompany.BrandId);
+        _mockCompanyRepository.Verify(repo => repo.GetByIdAsync(companyId), Times.Once);
+        _mockCompanyRepository.Verify(repo => repo.Update(It.IsAny<Company>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateCompanyAsync_ShouldThrowException_WhenCompanyDoesNotExist()
+    {
+        // Arrange
+        var companyId = Guid.NewGuid();
+        var updatedCompany = new UpdateCompanyModel { Name = "New Name", Cvr = "2222", BrandId = Guid.NewGuid().ToString() };
+
+        _mockCompanyRepository
+            .Setup(repo => repo.GetOrDefaultByIdAsync(companyId))
+            .ReturnsAsync((Company?)null);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<NullReferenceException>(() =>
+            _companyService.UpdateCompanyAsync(companyId, updatedCompany));
+    }
+
+    [Fact]
+    public async Task DeleteCompanyAsync_ShouldReturnTrue_WhenCompanyExists()
+    {
+        // Arrange
+        var companyId = Guid.NewGuid();
+
+        _mockCompanyRepository
+            .Setup(repo => repo.DeleteByIdAsync(companyId))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _companyService.DeleteCompanyAsync(companyId);
+
+        // Assert
+        Assert.True(result);
+        _mockCompanyRepository.Verify(repo => repo.DeleteByIdAsync(companyId), Times.Once);
+    }
+    
 }
