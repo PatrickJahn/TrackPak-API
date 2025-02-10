@@ -2,57 +2,49 @@ using LocationService.Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shared.Messaging;
+using Shared.Messaging.Events.Company;
+using Shared.Messaging.Events.Employee;
+using Shared.Messaging.Events.Order;
 using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
 using Shared.Models;
 
 namespace LocationService.Infrastructure.Messaging;
-public class MessageConsumerService : BackgroundService
+public class MessageConsumerService(IMessageBus messageBus, IServiceProvider serviceProvider)
+    : BackgroundService
 {
-    private readonly IMessageBus _messageBus;
-    private readonly IServiceScopeFactory _serviceScopeFactory;
-
-    public MessageConsumerService(IMessageBus messageBus, IServiceScopeFactory serviceScopeFactory)
-    {
-        _messageBus = messageBus;
-        _serviceScopeFactory = serviceScopeFactory;
-    }
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await _messageBus.SubscribeAsync<UserCreatedEvent>(
-            MessageTopic.UserLocationCreated,
-             (message) =>
+        await messageBus.SubscribeAsync<UserCreatedEvent>(
+            MessageTopic.UserCreated, async (message) =>
             {
-                 _ = HandleUserCreatedEvent(message);
+                using var scope = serviceProvider.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<UserCreatedEvent>>();
+                await handler.HandleAsync(message, stoppingToken);
+            });
+
+        await messageBus.SubscribeAsync<OrderCreatedEvent>(
+            MessageTopic.OrderCreated, async (message) =>
+            {
+                using var scope = serviceProvider.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<OrderCreatedEvent>>();
+                await handler.HandleAsync(message, stoppingToken);
+            });
+
+        await messageBus.SubscribeAsync<EmployeeCreatedEvent>(
+            MessageTopic.EmployeeCreated, async (message) =>
+            {
+                using var scope = serviceProvider.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<EmployeeCreatedEvent>>();
+                await handler.HandleAsync(message, stoppingToken);
+            });
+
+        await messageBus.SubscribeAsync<CompanyCreatedEvent>(
+            MessageTopic.CompanyCreated, async (message) =>
+            {
+                using var scope = serviceProvider.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<CompanyCreatedEvent>>();
+                await handler.HandleAsync(message, stoppingToken);
             });
     }
-
-    private async Task HandleUserCreatedEvent(UserCreatedEvent message)
-    {
-        using var scope = _serviceScopeFactory.CreateScope(); 
-        var locationService = scope.ServiceProvider.GetRequiredService<ILocationService>(); 
-        try
-        {
-            var locationId = await locationService.CreateLocationAsync(
-                new CreateLocationRequestModel()
-                {
-                    City = message.Location.City,
-                    AddressLine = message.Location.AddressLine,
-                    PostalCode = message.Location.PostalCode,
-                    Country = message.Location.Country
-                });
-            
-            await _messageBus.PublishAsync(MessageTopic.UserLocationCreated, locationId);
-        }
-        catch (Exception e)
-        {
-            // TODO: Handle
-            Console.WriteLine("Location service failed to create location or publish message");
-            Console.WriteLine(e);
-            throw;
-        }
-    }
-    
 }
-
