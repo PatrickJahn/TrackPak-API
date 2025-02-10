@@ -18,9 +18,9 @@ public class LocationService: ILocationService
         _geocodingService = geocodingService ?? throw new ArgumentNullException(nameof(geocodingService));
     }
 
-    public async Task<Location> GetLocationByIdAsync(Guid id)
+    public async Task<Location?> GetLocationByIdAsync(Guid id)
     {
-        return await _locationRepo.GetByIdAsync(id);
+        return await _locationRepo.GetOrDefaultByIdAsync(id);
          
     }
 
@@ -43,7 +43,6 @@ public class LocationService: ILocationService
             AddressLine = requestModel.AddressLine,
             PostalCode = requestModel.PostalCode,
             GeoLocation = geoLocation,
-            
         };
 
         await _locationRepo.AddAsync(location);
