@@ -5,22 +5,25 @@ using CompanyService.Domain.Interfaces;
 
 namespace CompanyService.Application.Services;
 
-public class CompanyService(ICompanyRepository companyRepository) : ICompanyService
+public class CompanyService(ICompanyRepository companyRepository, ICompanyEventPublisher eventPublisher) : ICompanyService
 {
-    public async Task<Company> CreateCompanyAsync(CreateCompanyModel company, CancellationToken cancellationToken = default)
+    public async Task<Company> CreateCompanyAsync(CreateCompanyModel model, CancellationToken cancellationToken = default)
     {
+        
+        // TODO: Check if company with same cvr exists and handle
+        
         var newCompany = new Company()
         {
-            Name = company.Name,
-            Cvr = company.Cvr,
-            BrandId = company.BrandId,
+            Name = model.Name,
+            Cvr = model.Cvr,
+            BrandId = model.BrandId,
             LocationId = null,
             CreatedAt = DateTime.UtcNow
         };
         
         await companyRepository.AddAsync(newCompany);
-    
-        // SEND event
+        
+        await eventPublisher.PublishCompanyCreatedAsync(newCompany, model.Location);
 
         return newCompany;
     }

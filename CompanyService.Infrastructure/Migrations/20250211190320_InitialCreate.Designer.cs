@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CompanyService.Infrastructure.Migrations
 {
     [DbContext(typeof(CompanyDbContext))]
-    [Migration("20250209192705_InitialCreate")]
+    [Migration("20250211190320_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -34,9 +34,6 @@ namespace CompanyService.Infrastructure.Migrations
                     b.Property<string>("BrandId")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Guid>("CompanyId")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
