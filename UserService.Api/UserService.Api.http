@@ -1,12 +1,12 @@
 @UserService.Api_HostAddress = http://localhost:5218
 
-GET  http://localhost:5218/user/7988f0f8-c8da-4676-ba62-cfd45f010446
+GET  http://localhost:5218/users/7988f0f8-c8da-4676-ba62-cfd45f010446
 Accept: application/json
 
 ###
 
 
-POST http://localhost:5218/user/
+POST http://localhost:5218/users/
 Content-Type: application/json
 Accept: application/json
 
