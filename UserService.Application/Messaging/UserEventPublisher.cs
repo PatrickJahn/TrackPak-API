@@ -1,6 +1,7 @@
 using Shared.Messaging;
 using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
+using Shared.Models;
 using UserService.Application.Interfaces;
 using UserService.Application.Models;
 
@@ -20,5 +21,16 @@ public class UserEventPublisher(IMessageBus messageBus) : IUserEventPublisher
         };
 
         await messageBus.PublishAsync(MessageTopic.UserCreated, userCreatedEvent);
+    }
+
+    public async Task PublishUserLocationUpdatedAsync(Guid userId, UpdateLocationModel model)
+    {
+
+        var userLocationUpdatedEvent = new UserLocationUpdatedEvent()
+        {
+            Location = model,
+            UserId = userId
+        };
+        await messageBus.PublishAsync(MessageTopic.UserLocationUpdated, userLocationUpdatedEvent);
     }
 }

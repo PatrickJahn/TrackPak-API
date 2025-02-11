@@ -6,14 +6,14 @@ namespace UserService.Application.Interfaces;
 
 public interface IUserService
 {
-    public Task<User> GetUserByIdAsync(Guid userId);
+    public Task<User> GetUserByIdAsync(Guid userId,  CancellationToken cancellationToken);
     
-    public Task<User> UpdateUserAsync(Guid userId, UpdateUserModel userModel);
+    public Task<User> UpdateUserAsync(Guid userId, UpdateUserModel userModel,  CancellationToken cancellationToken);
     
-    public Task<User> UpdateUserLocationAsync(Guid userId, UpdateLocationModel locationModel);
+    public Task UpdateUserLocationAsync(Guid userId, UpdateLocationModel locationModel,  CancellationToken cancellationToken);
 
-    public Task DeleteUserAsync(Guid userId);
+    public Task DeleteUserAsync(Guid userId,  CancellationToken cancellationToken);
 
-    public Task CreateUser(CreateUserModel userModel);
+    public Task CreateUser(CreateUserModel userModel, CancellationToken cancellationToken);
 
 }

@@ -6,7 +6,7 @@ using Shared.Models;
 using Shared.Services;
 using UserService.Application.Interfaces;
 using UserService.Application.Models;
-using UserService.Application.Repositories;
+using UserService.Domain.Repositories;
 using UserService.Domain.entities;
 
 namespace UserService.Application.Services;
@@ -22,15 +22,17 @@ public class UserService: IUserService
         _userEventPublisher = userEventPublisher ?? throw new ArgumentNullException(nameof(userEventPublisher));
     }
 
-    public async Task<User> GetUserByIdAsync(Guid userId)
+    public async Task<User> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
        return await _userRepo.GetByIdAsync(userId);
     }
 
-    public async Task<User> UpdateUserAsync(Guid userId,UpdateUserModel userModel)
+    public async Task<User> UpdateUserAsync(Guid userId, UpdateUserModel userModel, CancellationToken cancellationToken)
     {
         
-        // TODO:  Check if user with email or phone exists
+        // TODO: Improve 
+        await CheckIfUserExistWithEmail(userModel.Email, cancellationToken);
+        await CheckIfUserExistWithPhone(userModel.PhoneNumber, cancellationToken);
         
         var user = await _userRepo.GetByIdAsync(userId);
 
@@ -44,23 +46,31 @@ public class UserService: IUserService
         return user;
     }
 
-    public Task<User> UpdateUserLocationAsync(Guid userId, UpdateLocationModel locationModel)
+    public async Task UpdateUserLocationAsync(Guid userId, UpdateLocationModel locationModel, CancellationToken cancellationToken)
     {
-        // TODO: Implement
-        throw new NotImplementedException();
+
+        var userExists = await _userRepo.ExistsAsync(userId);
+        if (!userExists)
+        {
+            throw new Exception("User does not exist");
+        }
+        
+        await _userEventPublisher.PublishUserLocationUpdatedAsync(userId, locationModel);
+        
     }
 
-    public async Task DeleteUserAsync(Guid userId)
+    public async Task DeleteUserAsync(Guid userId, CancellationToken cancellationToken)
     {
        await _userRepo.DeleteByIdAsync(userId);
     }
 
-    public async Task CreateUser(CreateUserModel userModel)
+    public async Task CreateUser(CreateUserModel userModel, CancellationToken cancellationToken)
     {
         
-        
-        // TODO: Check if user with same email or phone exists
-        
+        // TODO: Improve 
+        await CheckIfUserExistWithEmail(userModel.Email, cancellationToken);
+        await CheckIfUserExistWithPhone(userModel.PhoneNumber, cancellationToken);
+
          await _userRepo.AddAsync(new User
          {
              PhoneNumber = userModel.PhoneNumber,
@@ -71,6 +81,22 @@ public class UserService: IUserService
          });
          
         await _userEventPublisher.PublishUserCreatedAsync(userModel);
+    }
+
+    private async Task CheckIfUserExistWithEmail(string email, CancellationToken cancellationToken)
+    {
+      var emailInUse = await _userRepo.GetByEmailAsync(email, cancellationToken);
+      
+      if(emailInUse is not null)
+          throw new Exception($"Email {email} already exists");
+    }
+    
+    private async Task CheckIfUserExistWithPhone( string phoneNumber, CancellationToken cancellationToken)
+    {
+        var phoneInUse = await _userRepo.GetByPhoneAsync(phoneNumber, cancellationToken);
+      
+        if(phoneInUse is not null)
+            throw new Exception($"Email {phoneNumber} already exists");
     }
 
 

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shared.Messaging;
 using Shared.Services;
-using UserService.Application.Repositories;
+using UserService.Domain.Repositories;
 using UserService.Infrastructure.DbContext;
 using UserService.Infrastructure.Messaging;
 using UserService.Infrastructure.Repositories;
