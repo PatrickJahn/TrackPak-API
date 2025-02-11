@@ -5,7 +5,7 @@ using Shared.Models;
 using UserService.Application.Interfaces;
 using UserService.Application.Models;
 
-namespace UserService.Application.Messaging;
+namespace UserService.Infrastructure.Messaging;
 
 public class UserEventPublisher(IMessageBus messageBus) : IUserEventPublisher
 {

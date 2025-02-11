@@ -11,7 +11,6 @@ public static class DependencyInjection
 {
     public static void AddApplication(this IServiceCollection services)
     {
-        services.AddScoped<IUserEventPublisher, UserEventPublisher>();
         services.AddScoped<IUserService, Services.UserService>();
         
         // MessageHandlers

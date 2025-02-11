@@ -4,6 +4,7 @@ using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
 using UserService.Application.Messaging;
 using UserService.Application.Models;
+using UserService.Infrastructure.Messaging;
 
 namespace UserService.Tests;
 

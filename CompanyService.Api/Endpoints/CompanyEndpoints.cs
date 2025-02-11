@@ -20,14 +20,13 @@ public static class CompanyEndpoints
         group.MapDelete("/{companyId}", DeleteCompanyAsync);
     }
 
-    private static async Task<Results<Created<Company>, BadRequest<string>>> CreateCompanyAsync(
+    private static async Task<IResult> CreateCompanyAsync(
         CreateCompanyModel company,
         ICompanyService companyService,
         CancellationToken cancellationToken)
     {
         var createdCompany = await companyService.CreateCompanyAsync(company, cancellationToken);
-        return createdCompany != null ? TypedResults.Created($"/companies/{createdCompany.CompanyId}", createdCompany) 
-                                      : TypedResults.BadRequest("Failed to create company.");
+        return Results.Ok(createdCompany);
     }
 
     private static async Task<Results<Ok<Company>, NotFound>> GetCompanyByIdAsync(
@@ -47,22 +46,22 @@ public static class CompanyEndpoints
         return TypedResults.Ok(companies);
     }
 
-    private static async Task<Results<NoContent, NotFound>> UpdateCompanyAsync(
+    private static async Task<Results<Ok, NotFound>> UpdateCompanyAsync(
         Guid companyId,
         UpdateCompanyModel updatedCompany,
         ICompanyService companyService,
         CancellationToken cancellationToken)
     {
         var updated = await companyService.UpdateCompanyAsync(companyId, updatedCompany, cancellationToken);
-        return updated ? TypedResults.NoContent() : TypedResults.NotFound();
+        return updated ? TypedResults.Ok() : TypedResults.NotFound();
     }
 
-    private static async Task<Results<NoContent, NotFound>> DeleteCompanyAsync(
+    private static async Task<Results<Ok, NotFound>> DeleteCompanyAsync(
         Guid companyId,
         ICompanyService companyService,
         CancellationToken cancellationToken)
     {
         var deleted = await companyService.DeleteCompanyAsync(companyId, cancellationToken);
-        return deleted ? TypedResults.NoContent() : TypedResults.NotFound();
+        return deleted ? TypedResults.Ok() : TypedResults.NotFound();
     }
 }
