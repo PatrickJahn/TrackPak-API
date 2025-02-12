@@ -1,3 +1,4 @@
+using CompanyService.Api.Endpoints;
 using CompanyService.Application;
 using CompanyService.Infrastructure;
 
@@ -20,6 +21,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapCompanyEndpoints();
 
 
 app.Run();

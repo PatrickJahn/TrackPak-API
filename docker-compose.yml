@@ -5,6 +5,25 @@ services:
       - "5672:5672"   # RabbitMQ message broker port
       - "15672:15672" # RabbitMQ management UI
 
+  api-gateway:
+    image: trackpak-apigateway
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    ports:
+      - "5056:8080" # API Gateway port
+    depends_on:
+      - company-service
+      - location-service
+      - order-service
+      - user-service
+      - tracking-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - OCELOT_CONFIGURATION=ocelot.json # Ocelot config file
+    networks:
+      - trackpak-network
+  
   company-service:
     image: trackpak-companyservice
     build:
@@ -14,61 +33,82 @@ services:
       - rabbitmq
       - company-db
     deploy:
-      replicas: 2  # Two replicas for x-axis scaling
+      replicas: 2
       restart_policy:
         condition: on-failure
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__Postgres=Host=company-db;Port=5432;Database=trackpak-companydb;Username=developer;Password=trackPak_dev_password
-  
+    networks:
+      - trackpak-network
+    
   location-service:
-    image: trackpak-locationservice
-    build:
-      context: .
-      dockerfile: LocationService.Api/Dockerfile
-    depends_on:
-      - rabbitmq
-      - location-db
-    deploy:
-      replicas: 2  # Two replicas for x-axis scaling
-      restart_policy:
-        condition: on-failure
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Postgres=Host=location-db;Port=5432;Database=trackpak-locationdb;Username=developer;Password=trackPak_dev_password
-  
+      image: trackpak-locationservice
+      build:
+        context: .
+        dockerfile: LocationService.Api/Dockerfile
+      depends_on:
+        - rabbitmq
+        - location-db
+      deploy:
+        replicas: 2
+        restart_policy:
+          condition: on-failure
+      environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ConnectionStrings__Postgres=Host=location-db;Port=5432;Database=trackpak-locationdb;Username=developer;Password=trackPak_dev_password
+      networks:
+        - trackpak-network
+    
   order-service:
-    image: trackpak-orderservice
+      image: trackpak-orderservice
+      build:
+        context: .
+        dockerfile: OrderService.Api/Dockerfile
+      depends_on:
+        - rabbitmq
+        - order-db
+      deploy:
+        replicas: 2
+        restart_policy:
+          condition: on-failure
+      environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ConnectionStrings__Postgres=Host=order-db;Port=5432;Database=trackpak-orderdb;Username=developer;Password=trackPak_dev_password
+      networks:
+        - trackpak-network
+    
+  user-service:
+      image: trackpak-userservice
+      build:
+        context: .
+        dockerfile: UserService.Api/Dockerfile
+      depends_on:
+        - rabbitmq
+        - user-db
+      deploy:
+        replicas: 2
+        restart_policy:
+          condition: on-failure
+      environment:
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ConnectionStrings__Postgres=Host=user-db;Port=5432;Database=trackpak-userdb;Username=developer;Password=trackPak_dev_password
+      networks:
+        - trackpak-network
+      
+  tracking-service:
+    image: trackpak-trackingservice
     build:
       context: .
-      dockerfile: OrderService.Api/Dockerfile
-    depends_on:
-      - rabbitmq
-      - order-db
+      dockerfile: TrackingService.Api/Dockerfile
     deploy:
-      replicas: 2  # Two replicas for x-axis scaling
       restart_policy:
         condition: on-failure
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Postgres=Host=order-db;Port=5432;Database=trackpak-orderdb;Username=developer;Password=trackPak_dev_password
-  
-  User-service:
-    image: trackpak-userservice
-    build:
-      context: .
-      dockerfile: UserService.Api/Dockerfile
-    depends_on:
-      - rabbitmq
-      - user-db
-    deploy:
-      replicas: 2  # Two replicas for x-axis scaling
-      restart_policy:
-        condition: on-failure
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Postgres=Host=user-db;Port=5432;Database=trackpak-userdb;Username=developer;Password=trackPak_dev_password
-  
+    networks:
+      - trackpak-network
+        
   company-db:
     image: postgres:15
     container_name: company-db
@@ -81,6 +121,8 @@ services:
       - "5432:5432"
     volumes:
       - company-db-data:/var/lib/postgresql/data
+    networks:
+      - trackpak-network
       
   location-db:
     image: postgres:15
@@ -94,6 +136,8 @@ services:
       - "5433:5432"
     volumes:
       - location-db-data:/var/lib/postgresql/data
+    networks:
+      - trackpak-network
     
   order-db:
     image: postgres:15
@@ -107,6 +151,8 @@ services:
       - "5434:5432"
     volumes:
       - order-db-data:/var/lib/postgresql/data
+    networks:
+      - trackpak-network
   
   user-db:
     image: postgres:15
@@ -120,8 +166,15 @@ services:
       - "5435:5432"
     volumes:
       - user-db-data:/var/lib/postgresql/data
+    networks:
+      - trackpak-network
         
   
+
+networks:
+  trackpak-network:
+    driver: bridge 
+    
 volumes:
   company-db-data:
   location-db-data:
