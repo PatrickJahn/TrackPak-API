@@ -2,8 +2,10 @@ using Moq;
 using Shared.Messaging;
 using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
+using Shared.Models;
 using UserService.Application.Messaging;
 using UserService.Application.Models;
+using UserService.Domain.entities;
 using UserService.Infrastructure.Messaging;
 
 namespace UserService.Tests;
@@ -23,31 +25,32 @@ public class UserEventPublisherTests
     public async Task PublishUserCreatedAsync_Should_Call_MessageBus_With_Correct_Event()
     {
         // Arrange
-        var userModel = new CreateUserModel
+        var user = new User
         {
             PhoneNumber = "123456789",
             Email = "test@example.com",
             FirstName = "John",
-            LastName = "Doe",
-            Location = {}
+            LastName = "Doe"
         };
+
+        var location = new CreateLocationRequestModel();
 
         _messageBusMock
             .Setup(bus => bus.PublishAsync(It.IsAny<MessageTopic>(), It.IsAny<UserCreatedEvent>()))
             .Returns(Task.CompletedTask);
 
         // Act
-        await _eventPublisher.PublishUserCreatedAsync(userModel);
+        await _eventPublisher.PublishUserCreatedAsync(user, location);
 
         // Assert
         _messageBusMock.Verify(bus => bus.PublishAsync(
             MessageTopic.UserCreated,
             It.Is<UserCreatedEvent>(e =>
-                e.Email == userModel.Email &&
-                e.PhoneNumber == userModel.PhoneNumber &&
-                e.FirstName == userModel.FirstName &&
-                e.LastName == userModel.LastName &&
-                e.Location == userModel.Location)
+                e.Email == user.Email &&
+                e.PhoneNumber == user.PhoneNumber &&
+                e.FirstName == user.FirstName &&
+                e.LastName == user.LastName &&
+                e.Location == location)
         ), Times.Once);
         
     }
