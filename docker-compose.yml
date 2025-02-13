@@ -4,6 +4,8 @@ services:
     ports:
       - "5672:5672"   # RabbitMQ message broker port
       - "15672:15672" # RabbitMQ management UI
+    networks:
+      - trackpak-network
 
   api-gateway:
     image: trackpak-apigateway
@@ -34,8 +36,7 @@ services:
       - company-db
     deploy:
       replicas: 2
-      restart_policy:
-        condition: on-failure
+    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__Postgres=Host=company-db;Port=5432;Database=trackpak-companydb;Username=developer;Password=trackPak_dev_password
@@ -52,8 +53,7 @@ services:
         - location-db
       deploy:
         replicas: 2
-        restart_policy:
-          condition: on-failure
+      restart: unless-stopped
       environment:
         - ASPNETCORE_ENVIRONMENT=Development
         - ConnectionStrings__Postgres=Host=location-db;Port=5432;Database=trackpak-locationdb;Username=developer;Password=trackPak_dev_password
@@ -70,8 +70,7 @@ services:
         - order-db
       deploy:
         replicas: 2
-        restart_policy:
-          condition: on-failure
+      restart: unless-stopped
       environment:
         - ASPNETCORE_ENVIRONMENT=Development
         - ConnectionStrings__Postgres=Host=order-db;Port=5432;Database=trackpak-orderdb;Username=developer;Password=trackPak_dev_password
@@ -88,8 +87,7 @@ services:
         - user-db
       deploy:
         replicas: 2
-        restart_policy:
-          condition: on-failure
+      restart: unless-stopped
       environment:
         - ASPNETCORE_ENVIRONMENT=Development
         - ConnectionStrings__Postgres=Host=user-db;Port=5432;Database=trackpak-userdb;Username=developer;Password=trackPak_dev_password
@@ -101,9 +99,7 @@ services:
     build:
       context: .
       dockerfile: TrackingService.Api/Dockerfile
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     networks:

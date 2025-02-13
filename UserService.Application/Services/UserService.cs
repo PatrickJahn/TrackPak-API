@@ -71,16 +71,18 @@ public class UserService: IUserService
         await CheckIfUserExistWithEmail(userModel.Email, cancellationToken);
         await CheckIfUserExistWithPhone(userModel.PhoneNumber, cancellationToken);
 
-         await _userRepo.AddAsync(new User
-         {
-             PhoneNumber = userModel.PhoneNumber,
-             Email = userModel.Email,
-             FirstName =  userModel.FirstName,
-             LastName = userModel.LastName,
-             LocationId = null
-         });
+        var user = new User
+        {
+            PhoneNumber = userModel.PhoneNumber,
+            Email = userModel.Email,
+            FirstName = userModel.FirstName,
+            LastName = userModel.LastName,
+            LocationId = null
+        };
+        
+        await _userRepo.AddAsync(user);
          
-        await _userEventPublisher.PublishUserCreatedAsync(userModel);
+        await _userEventPublisher.PublishUserCreatedAsync(user, userModel.Location);
     }
 
     private async Task CheckIfUserExistWithEmail(string email, CancellationToken cancellationToken)

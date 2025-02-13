@@ -148,7 +148,7 @@ namespace UserService.Tests;
                 .Returns(Task.CompletedTask);
 
             _userEventPublisherMock
-                .Setup(pub => pub.PublishUserCreatedAsync(It.IsAny<CreateUserModel>()))
+                .Setup(pub => pub.PublishUserCreatedAsync(It.IsAny<User>(), It.IsAny<CreateLocationRequestModel>()))
                 .Returns(Task.CompletedTask);
 
             // Act
@@ -162,12 +162,12 @@ namespace UserService.Tests;
                 u.LastName == userModel.LastName &&
                 u.LocationId == null)), Times.Once);
 
-            _userEventPublisherMock.Verify(pub => pub.PublishUserCreatedAsync(It.Is<CreateUserModel>(u =>
+            _userEventPublisherMock.Verify(pub => pub.PublishUserCreatedAsync(It.Is<User>(u =>
                 u.Email == userModel.Email &&
                 u.PhoneNumber == userModel.PhoneNumber &&
                 u.FirstName == userModel.FirstName &&
-                u.LastName == userModel.LastName &&
-                u.Location == userModel.Location)), Times.Once);
+                u.LastName == userModel.LastName
+             ), It.IsAny<CreateLocationRequestModel>()), Times.Once);
         }
         
         [Fact]
