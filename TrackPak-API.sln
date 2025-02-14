@@ -61,6 +61,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateway", "ApiGateway", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{988DFC2F-F397-45BB-BD2A-606193755E3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackPak.IntegrationTests", "TrackPak.IntegrationTests\TrackPak.IntegrationTests.csproj", "{AAE53FF2-1B70-44E0-BCDB-1135C05E1E5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -162,6 +164,10 @@ Global
 		{988DFC2F-F397-45BB-BD2A-606193755E3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{988DFC2F-F397-45BB-BD2A-606193755E3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{988DFC2F-F397-45BB-BD2A-606193755E3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAE53FF2-1B70-44E0-BCDB-1135C05E1E5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAE53FF2-1B70-44E0-BCDB-1135C05E1E5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAE53FF2-1B70-44E0-BCDB-1135C05E1E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAE53FF2-1B70-44E0-BCDB-1135C05E1E5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9120A140-591D-434A-8091-7B5566730F48} = {5BB9AB1E-D335-4D4B-9E5F-DA250999DD19}
