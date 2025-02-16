@@ -26,6 +26,7 @@ using UserService.Infrastructure.Messaging;
 
 namespace TrackPak.IntegrationTests;
 
+[Trait("Category", "IntegrationTests")]
 public class CompanyServiceIntegrationTests : IClassFixture<RabbitMqTestContainer>
 {
     private readonly IServiceProvider _serviceProvider;
