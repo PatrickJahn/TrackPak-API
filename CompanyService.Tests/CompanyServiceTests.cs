@@ -11,6 +11,7 @@ using Shared.Models;
 
 namespace CompanyService.Tests;
 
+[Trait("Category", "UnitTests")]
 public class CompanyServiceTests
     {
         

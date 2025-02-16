@@ -7,6 +7,7 @@ using GeoLocation = LocationService.Domain.Entities.GeoLocation;
 
 namespace LocationService.Tests;
 
+[Trait("Category", "UnitTests")]
 public class LocationServiceTests
 {
     private readonly Mock<ILocationRepository> _locationRepoMock;

@@ -15,16 +15,12 @@ using UserService.Application.Models;
 using UserService.Domain.entities;
 using UserService.Domain.Repositories;
 using UserService.Infrastructure.Messaging;
+using EasyNetQ;
 
 namespace TrackPak.IntegrationTests;
 
 
-using System;
-using System.Text;
-using System.Threading.Tasks;
-using EasyNetQ;
-using Xunit;
-
+[Trait("Category", "IntegrationTests")]
 public class UserServiceIntegrationTests : IClassFixture<RabbitMqTestContainer>
 {
     private readonly IServiceProvider _serviceProvider;

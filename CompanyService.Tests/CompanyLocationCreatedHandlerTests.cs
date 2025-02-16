@@ -6,6 +6,7 @@ using Shared.Messaging.Events.Location;
 
 namespace CompanyService.Tests;
 
+[Trait("Category", "UnitTests")]
 public class CompanyLocationCreatedHandlerTests
 {
     private readonly Mock<ICompanyRepository> _companyRepositoryMock;

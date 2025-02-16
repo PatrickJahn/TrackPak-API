@@ -6,7 +6,7 @@ using UserService.Domain.Repositories;
 using UserService.Domain.entities;
 
 namespace UserService.Tests;
-
+[Trait("Category", "UnitTests")]
 public class UserLocationCreatedHandlerTests
 {
     private readonly Mock<IUserRepository> _mockUserRepository;

@@ -6,6 +6,7 @@ using Shared.Messaging.Topics;
 
 namespace LocationService.Tests;
 
+[Trait("Category", "UnitTests")]
 public class LocationEventPublisherTests{
 
 private readonly Mock<IMessageBus> _messageBusMock;

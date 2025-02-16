@@ -8,6 +8,7 @@ using Shared.Models;
 
 namespace CompanyService.Tests;
 
+[Trait("Category", "UnitTests")]
 public class CompanyEventPublisherTests
 {
     private readonly Mock<IMessageBus> _messageBusMock;
