@@ -46,5 +46,13 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
                 var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<CompanyCreatedEvent>>();
                 await handler.HandleAsync(message, stoppingToken);
             });
+        
+        await messageBus.SubscribeAsync<UserLocationUpdatedEvent>(
+            MessageTopic.UserLocationUpdated, async (message) =>
+            {
+                using var scope = serviceProvider.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<UserLocationUpdatedEvent>>();
+                await handler.HandleAsync(message, stoppingToken);
+            });
     }
 }

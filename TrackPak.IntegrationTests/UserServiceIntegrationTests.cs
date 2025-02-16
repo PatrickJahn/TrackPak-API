@@ -37,6 +37,7 @@ public class UserServiceIntegrationTests : IClassFixture<RabbitMqTestContainer>
     private readonly LocationEventPublisher _locationEventPublisher;
     private readonly UserCreatedHandler _userCreatedHandler;
     private readonly UserLocationCreatedHandler _userLocationCreatedHandler;
+    private readonly UserLocationUpdatedHandler _userLocationUpdatedHandler;
 
     private readonly UserService.Application.Services.UserService _userService;
     private readonly LocationService.Application.Services.LocationService _locationService;
@@ -67,6 +68,7 @@ public class UserServiceIntegrationTests : IClassFixture<RabbitMqTestContainer>
         _locationService = new LocationService.Application.Services.LocationService(_locationRepoMock.Object, _geocodingServiceMock.Object);
 
         _userCreatedHandler = new UserCreatedHandler(_locationService, _locationEventPublisher);
+        _userLocationUpdatedHandler = new UserLocationUpdatedHandler(_locationService, _locationEventPublisher );
         _userLocationCreatedHandler = new UserLocationCreatedHandler(_userRepoMock.Object);
 
         // Subscribe handlers to RabbitMQ events
@@ -79,7 +81,13 @@ public class UserServiceIntegrationTests : IClassFixture<RabbitMqTestContainer>
             MessageTopic.UserLocationCreated,
             async evt => await _userLocationCreatedHandler.HandleAsync(evt, CancellationToken.None)
         );
-
+        
+        _rabbitMqServiceBus.SubscribeAsync<UserLocationUpdatedEvent>(
+            MessageTopic.UserLocationCreated,
+            async evt => await _userLocationUpdatedHandler.HandleAsync(evt, CancellationToken.None)
+        );
+        
+       
         // Setup mock data
         var testUser = new User
         {
@@ -126,6 +134,52 @@ public class UserServiceIntegrationTests : IClassFixture<RabbitMqTestContainer>
 
         // Assert: Verify that UserService created and updated the user's location (hence UserCreatedEvent and UserLocationCreatedEvent was processed)
         _userRepoMock.Verify(repo => repo.AddAsync(It.IsAny<User>()), Times.Once);
+        _userRepoMock.Verify(repo => repo.Update(It.IsAny<User>()), Times.Once);
+        
+        Assert.NotNull(updatedUser);
+        Assert.NotNull(updatedUser!.LocationId); 
+
+    }
+    
+    [Fact]
+    public async Task UpdateUserLocation_Should_CreateNewLocation_And_UpdateUser_With_LocationId()
+    {
+        // Arrange
+
+        var locationModel = new CreateLocationRequestModel()
+            {Country = "US", City = "New York", PostalCode = "12345", AddressLine = "Street 12"};
+        
+        
+        Guid userId = Guid.NewGuid();
+        User? updatedUser = null;
+        var testUser = new User
+        {
+            Id = userId,
+            Email = "test@example.com",
+            PhoneNumber = "123456789",
+            FirstName = "John",
+            LastName = "Doe",
+            LocationId = null // Initially null, will be updated
+        };
+
+        _userRepoMock.Setup(repo => repo.ExistsAsync(It.IsAny<Guid>()))!
+            .ReturnsAsync((Guid id) => true); 
+        
+        _userRepoMock.Setup(repo => repo.Update(It.IsAny<User>()))
+            .Callback<User>(user =>
+            {
+                updatedUser = user;
+            })
+            .Returns(Task.CompletedTask);
+        
+        // Act: Call UserService to create a user (this should trigger events)
+        await _userService.UpdateUserLocationAsync(userId, locationModel, CancellationToken.None);
+
+        // Wait for LocationService to process event and publish UserLocationCreatedEvent
+        await Task.Delay(2000); 
+        
+
+        // Assert: Verify that UserService created and updated the user's location (hence UserCreatedEvent and UserLocationCreatedEvent was processed)
         _userRepoMock.Verify(repo => repo.Update(It.IsAny<User>()), Times.Once);
         
         Assert.NotNull(updatedUser);

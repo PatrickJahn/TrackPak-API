@@ -25,7 +25,7 @@ public class UserEventPublisher(IMessageBus messageBus) : IUserEventPublisher
         await messageBus.PublishAsync(MessageTopic.UserCreated, userCreatedEvent);
     }
 
-    public async Task PublishUserLocationUpdatedAsync(Guid userId, UpdateLocationModel model)
+    public async Task PublishUserLocationUpdatedAsync(Guid userId, CreateLocationRequestModel model)
     {
 
         var userLocationUpdatedEvent = new UserLocationUpdatedEvent()

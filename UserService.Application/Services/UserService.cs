@@ -46,7 +46,7 @@ public class UserService: IUserService
         return user;
     }
 
-    public async Task UpdateUserLocationAsync(Guid userId, UpdateLocationModel locationModel, CancellationToken cancellationToken)
+    public async Task UpdateUserLocationAsync(Guid userId, CreateLocationRequestModel locationModel, CancellationToken cancellationToken)
     {
 
         var userExists = await _userRepo.ExistsAsync(userId);
