@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Moq;
 using FluentAssertions;
+using Shared.Exceptions;
 using Shared.Messaging;
 using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
@@ -238,7 +239,7 @@ namespace UserService.Tests;
         _userRepoMock.Setup(repo => repo.GetByEmailAsync(userModel.Email, It.IsAny<CancellationToken>())).ReturnsAsync(existingUser); // Email already in use
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() =>
+        await Assert.ThrowsAsync<ConflictException>(() =>
             _userService.UpdateUserAsync(userId, userModel, CancellationToken.None)
         );
     }
@@ -271,7 +272,7 @@ namespace UserService.Tests;
         _userRepoMock.Setup(repo => repo.GetByPhoneAsync(userModel.PhoneNumber, It.IsAny<CancellationToken>())).ReturnsAsync(existingUser); // Phone already in use
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() =>
+        await Assert.ThrowsAsync<ConflictException>(() =>
             _userService.UpdateUserAsync(userId, userModel, CancellationToken.None)
         );
     }
