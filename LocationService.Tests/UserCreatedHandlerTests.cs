@@ -9,6 +9,7 @@ using Shared.Models;
 
 namespace LocationService.Tests;
 
+[Trait("Category", "UnitTests")]
 public class UserCreatedHandlerTests
 {
     private readonly Mock<ILocationService> _locationServiceMock;

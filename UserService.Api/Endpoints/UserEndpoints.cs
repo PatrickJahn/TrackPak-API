@@ -46,7 +46,7 @@ public static class UserEndpoints
     }
     
     
-    private static async Task<IResult> UpdateUserLocation(Guid id, [FromBody] UpdateLocationModel request, IUserService service, CancellationToken cancellationToken)
+    private static async Task<IResult> UpdateUserLocation(Guid id, [FromBody] CreateLocationRequestModel request, IUserService service, CancellationToken cancellationToken)
     {
         await service.UpdateUserLocationAsync(id, request, cancellationToken);
         return Results.Ok();

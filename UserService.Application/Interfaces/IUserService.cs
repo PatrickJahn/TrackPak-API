@@ -10,7 +10,7 @@ public interface IUserService
     
     public Task<User> UpdateUserAsync(Guid userId, UpdateUserModel userModel,  CancellationToken cancellationToken);
     
-    public Task UpdateUserLocationAsync(Guid userId, UpdateLocationModel locationModel,  CancellationToken cancellationToken);
+    public Task UpdateUserLocationAsync(Guid userId, CreateLocationRequestModel locationModel,  CancellationToken cancellationToken);
 
     public Task DeleteUserAsync(Guid userId,  CancellationToken cancellationToken);
 

@@ -10,6 +10,7 @@ using UserService.Infrastructure.Messaging;
 
 namespace UserService.Tests;
 
+[Trait("Category", "UnitTests")]
 public class UserEventPublisherTests
 {
     private readonly Mock<IMessageBus> _messageBusMock;

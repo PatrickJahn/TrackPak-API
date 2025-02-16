@@ -7,7 +7,7 @@ using Shared.Messaging.Events.Location;
 using Shared.Models;
 
 namespace LocationService.Tests;
-
+[Trait("Category", "UnitTests")]
 public class CompanyCreatedHandlerTests
 {
     private readonly Mock<ILocationService> _locationServiceMock;

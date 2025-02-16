@@ -17,7 +17,7 @@ using UserService.Domain.entities;
 
 namespace UserService.Tests;
 
-
+    [Trait("Category", "UnitTests")]
     public class UserServiceTests
     {
         private readonly Mock<IUserRepository> _userRepoMock;

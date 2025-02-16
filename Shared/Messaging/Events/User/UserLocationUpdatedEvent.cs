@@ -6,5 +6,5 @@ public class UserLocationUpdatedEvent
 {
     public Guid UserId { get; set; }
  
-    public UpdateLocationModel Location { get; set; }
+    public CreateLocationRequestModel Location { get; set; }
 }
