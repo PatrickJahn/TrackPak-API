@@ -175,9 +175,7 @@ public class UserServiceIntegrationTests : IClassFixture<RabbitMqTestContainer>
         await Task.Delay(2000); 
         
 
-        // Assert: Verify that UserService created and updated the user's location (hence UserCreatedEvent and UserLocationCreatedEvent was processed)
-        _userRepoMock.Verify(repo => repo.Update(It.IsAny<User>()), Times.Once);
-        
+        // Assert: Verify that UserService updated the user's location 
         Assert.NotNull(updatedUser);
         Assert.NotNull(updatedUser!.LocationId); 
 

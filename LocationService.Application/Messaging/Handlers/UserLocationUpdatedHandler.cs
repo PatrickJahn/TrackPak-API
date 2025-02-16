@@ -11,7 +11,7 @@ public class UserLocationUpdatedHandler(ILocationService locationService, ILocat
     public async Task HandleAsync(UserLocationUpdatedEvent message, CancellationToken cancellationToken)
     {
         // TODO: implement SAGA Pattern
-        var location =  await locationService.CreateLocationAsync(message.Location);
+        var location = await locationService.CreateLocationAsync(message.Location);
 
         await locationEventPublisher.PublishUserLocationCreatedAsync(new UserLocationCreatedEvent()
         {
