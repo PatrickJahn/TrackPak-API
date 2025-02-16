@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using Shared.Exceptions;
 using Shared.Messaging;
 using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
@@ -52,7 +53,7 @@ public class UserService: IUserService
         var userExists = await _userRepo.ExistsAsync(userId);
         if (!userExists)
         {
-            throw new Exception("User does not exist");
+            throw new NotFoundException("User does not exist");
         }
         
         await _userEventPublisher.PublishUserLocationUpdatedAsync(userId, locationModel);
@@ -90,7 +91,7 @@ public class UserService: IUserService
       var emailInUse = await _userRepo.GetByEmailAsync(email, cancellationToken);
       
       if(emailInUse is not null)
-          throw new Exception($"Email {email} already exists");
+          throw new ConflictException($"Email {email} already exists");
     }
     
     private async Task CheckIfUserExistWithPhone( string phoneNumber, CancellationToken cancellationToken)
@@ -98,7 +99,7 @@ public class UserService: IUserService
         var phoneInUse = await _userRepo.GetByPhoneAsync(phoneNumber, cancellationToken);
       
         if(phoneInUse is not null)
-            throw new Exception($"Email {phoneNumber} already exists");
+            throw new ConflictException($"Phonenumber {phoneNumber} already exists");
     }
 
 
