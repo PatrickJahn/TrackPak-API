@@ -2,6 +2,7 @@ using CompanyService.Domain.Entities;
 using CompanyService.Domain.Interfaces;
 using CompanyService.Infrastructure.DBContext;
 using Shared.Repositories;
+using Company = Shared.Models.Company;
 
 namespace CompanyService.Infrastructure.Repositories;
 

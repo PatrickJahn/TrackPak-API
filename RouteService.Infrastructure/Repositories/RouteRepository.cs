@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using RouteService.Domain.Entities;
 using RouteService.Domain.Interfaces;
 using RouteService.Infrastructure.DBContext;
@@ -6,14 +7,16 @@ namespace RouteService.Infrastructure.Repositories;
 
 public class RouteRepository(RouteDbContext context) : IRouteRepository
 {
-    public async Task<Route> GetRouteByIdAsync(string routeId)
+    public async Task<Route> GetRouteByIdAsync(Guid routeId)
     {
         return await context.Routes.FindAsync(routeId);
     }
 
-    public async Task<List<Route>> GetRoutesByEmployeeIdAsync(string employeeId)
+    public async Task<List<Route>> GetRoutesByEmployeeIdAsync(Guid? employeeId)
     {
-        return await context.Routes.Where(r => r.EmployeeId == employeeId);
+        return await context.Routes
+            .Where(r => employeeId == null ? r.EmployeeId == null : r.EmployeeId == employeeId)
+            .ToListAsync();
     }
 
     public async Task<Route> CreateRouteAsync(Route route)
@@ -29,7 +32,7 @@ public class RouteRepository(RouteDbContext context) : IRouteRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task DeleteRouteAsync(string routeId)
+    public async Task DeleteRouteAsync(Guid routeId)
     {
         var route = await context.Routes.FindAsync(routeId);
         if (route != null)

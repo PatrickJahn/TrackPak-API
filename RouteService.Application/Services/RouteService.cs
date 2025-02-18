@@ -2,112 +2,132 @@ using RouteService.Application.Interfaces;
 using RouteService.Domain.Entities;
 using RouteService.Domain.Interfaces;
 using Shared.Messaging.Events.Order;
+using Shared.Messaging.Events.Employee;
+using RouteService.Domain.Enums;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RouteService.Application.Services;
 
-public class RouteService : IRouteService
+public class RouteService(IRouteRepository routeRepository, IRouteOptimizer routeOptimizer)
+    : IRouteService
 {
-    private readonly IRouteRepository _routeRepository;
-    private readonly IRouteOptimizer _routeOptimizer;
-
-    public RouteService(IRouteRepository routeRepository, IRouteOptimizer routeOptimizer)
-    {
-        _routeRepository = routeRepository;
-        _routeOptimizer = routeOptimizer;
-    }
-
     // 1️⃣ Handles Order Created Event (Triggered by Order Service)
     public async Task HandleOrderCreatedAsync(OrderCreatedEvent orderEvent)
     {
-        // Find an active route for the employee assigned to this order (if any)
-        var existingRoutes = await _routeRepository.GetRoutesByEmployeeIdAsync(orderEvent.AssignedEmployeeId);
+        var existingRoutes = await routeRepository.GetRoutesByEmployeeIdAsync(null); // Get unassigned routes
 
-        if (existingRoutes == null)
+        Route routeToUse;
+
+        if (!existingRoutes.Any())
         {
-            // Create a new route for this employee
-            existingRoutes = new Route
+            // Create a new unassigned route
+            routeToUse = new Route
             {
-                EmployeeId = orderEvent.AssignedEmployeeId,
-                OrderIds = new List<string> { orderEvent.OrderId },
-                Status = "Pending"
+                EmployeeId = null,
+                OrderRoutes = new List<OrderRoute> 
+                { 
+                    new OrderRoute { Sequence = 1, OrderId = orderEvent.OrderId }
+                },
+                Status = RouteStatusEnum.Pending
             };
-            await _routeRepository.CreateRouteAsync(existingRoutes);
+            await routeRepository.CreateRouteAsync(routeToUse);
         }
         else
         {
-            // Add order to existing route
-            existingRoutes.OrderIds.Add(orderEvent.OrderId);
-            await _routeRepository.UpdateRouteAsync(existingRoutes);
+            // Use an existing pending route
+            routeToUse = existingRoutes.First();
+
+            // Determine the next available sequence number
+            int nextSequence = routeToUse.OrderRoutes.Any() ? routeToUse.OrderRoutes.Max(o => o.Sequence) + 1 : 1;
+            routeToUse.OrderRoutes.Add(new OrderRoute { Sequence = nextSequence, OrderId = orderEvent.OrderId });
+
+            await routeRepository.UpdateRouteAsync(routeToUse);
         }
     }
 
     // 2️⃣ Handles Order Cancellation Event (Triggered by Order Service)
     public async Task HandleOrderCancelledAsync(OrderCancelledEvent orderEvent)
     {
-        var routes = await _routeRepository.GetAllRoutesAsync();
-        var affectedRoute = routes.FirstOrDefault(r => r.OrderIds.Contains(orderEvent.OrderId));
+        var employeeRoutes = await routeRepository.GetRoutesByEmployeeIdAsync(null); // Fetch only unassigned routes
+
+        var affectedRoute = employeeRoutes.FirstOrDefault(r => r.OrderRoutes.Any(o => o.OrderId == orderEvent.OrderId));
 
         if (affectedRoute != null)
         {
-            affectedRoute.OrderIds.Remove(orderEvent.OrderId);
-            await _routeRepository.UpdateRouteAsync(affectedRoute);
+            var orderToRemove = affectedRoute.OrderRoutes.FirstOrDefault(o => o.OrderId == orderEvent.OrderId);
+            if (orderToRemove != null)
+            {
+                affectedRoute.OrderRoutes.Remove(orderToRemove);
+            }
+
+            // If route has no more orders, delete it
+            if (!affectedRoute.OrderRoutes.Any())
+            {
+                await routeRepository.DeleteRouteAsync(affectedRoute.Id);
+            }
+            else
+            {
+                await routeRepository.UpdateRouteAsync(affectedRoute);
+            }
         }
     }
 
     // 3️⃣ Handles Employee Check-In (Triggered by Employee Service)
     public async Task HandleEmployeeCheckedInAsync(EmployeeCheckedInEvent employeeEvent)
     {
-        // Assign employee to any pending unassigned routes
-        var pendingRoutes = await _routeRepository.GetRoutesByEmployeeIdAsync(null); // Fetch routes without employees
+        // Assign employee to the first available pending route
+        var pendingRoutes = await routeRepository.GetRoutesByEmployeeIdAsync(null);
 
         if (pendingRoutes.Any())
         {
             var routeToAssign = pendingRoutes.First();
             routeToAssign.EmployeeId = employeeEvent.EmployeeId;
-            await _routeRepository.UpdateRouteAsync(routeToAssign);
+            routeToAssign.Status = RouteStatusEnum.Assigned;
+            await routeRepository.UpdateRouteAsync(routeToAssign);
         }
     }
 
     // 4️⃣ Handles Employee Check-Out (Triggered by Employee Service)
     public async Task HandleEmployeeCheckedOutAsync(EmployeeCheckedOutEvent employeeEvent)
     {
-        var activeRoutes = await _routeRepository.GetRoutesByEmployeeIdAsync(employeeEvent.EmployeeId);
-        
+        var activeRoutes = await routeRepository.GetRoutesByEmployeeIdAsync(employeeEvent.EmployeeId);
+
         foreach (var route in activeRoutes)
         {
-            route.Status = "Pending"; // Mark route for reassignment
+            route.Status = RouteStatusEnum.Pending;
             route.EmployeeId = null;
-            await _routeRepository.UpdateRouteAsync(route);
+            await routeRepository.UpdateRouteAsync(route);
         }
     }
 
     // 5️⃣ Fetches Routes Assigned to an Employee
-    public async Task<List<Route>> GetRoutesByEmployeeIdAsync(string employeeId)
+    public async Task<List<Route>> GetRoutesByEmployeeIdAsync(Guid employeeId)
     {
-        return await _routeRepository.GetRoutesByEmployeeIdAsync(employeeId);
+        return await routeRepository.GetRoutesByEmployeeIdAsync(employeeId);
     }
 
     // 6️⃣ Marks a Route as Completed
-    public async Task<Route> MarkRouteAsCompletedAsync(string routeId)
+    public async Task<Route> MarkRouteAsCompletedAsync(Guid routeId)
     {
-        var route = await _routeRepository.GetRouteByIdAsync(routeId);
+        var route = await routeRepository.GetRouteByIdAsync(routeId);
         if (route == null)
             throw new Exception("Route not found.");
 
-        route.Status = "Completed";
+        route.Status = RouteStatusEnum.Completed;
         route.CompletedAt = DateTime.UtcNow;
-        await _routeRepository.UpdateRouteAsync(route);
+        await routeRepository.UpdateRouteAsync(route);
 
         return route;
     }
 
     // 7️⃣ Optimizes a Route Using PythonWorker (via gRPC)
-    public async Task OptimizeRouteAsync(string routeId)
+    public async Task OptimizeRouteAsync(Guid routeId)
     {
-        var route = await _routeRepository.GetRouteByIdAsync(routeId);
+        var route = await routeRepository.GetRouteByIdAsync(routeId);
         if (route == null)
             throw new Exception("Route not found.");
 
-        await _routeOptimizer.OptimizeRoute(route);
+        await routeOptimizer.OptimizeRoute(route);
     }
 }

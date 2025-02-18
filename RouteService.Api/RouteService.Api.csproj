@@ -8,7 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Grpc.Net.Client" Version="2.67.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
@@ -19,6 +24,10 @@
 
     <ItemGroup>
       <Folder Include="Endpoints\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RouteService.Infrastructure\RouteService.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

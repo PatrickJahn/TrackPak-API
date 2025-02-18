@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using CompanyService.Application.Interfaces;
 using CompanyService.Application.Models;
 using CompanyService.Domain.Entities;
-
+using Company = Shared.Models.Company;
 
 
 namespace CompanyService.Api.Endpoints;
