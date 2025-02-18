@@ -9,4 +9,5 @@ public class Route : BaseModel
     public Guid CompanyId { get; set; }
     public Dictionary<int, Guid> OrderIds { get; set; }
     public RouteStatusEnum Status { get; set; }
+    public DateTime? CompletedAt { get; set; }
 }
