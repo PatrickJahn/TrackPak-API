@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using CompanyService.Application.Models;
 using CompanyService.Domain.Interfaces;
 using Shared.Models;
+using Company = CompanyService.Domain.Entities.Company;
 
 namespace CompanyService.Tests;
 

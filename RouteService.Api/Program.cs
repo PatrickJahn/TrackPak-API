@@ -1,3 +1,4 @@
+using RouteService.Api.Endpoints;
 using RouteService.Application.Interfaces;
 using RouteService.Infrastructure;
 
@@ -18,5 +19,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//app.MapRouteEndpoints();
+app.MapRouteEndpoints();
 app.Run();

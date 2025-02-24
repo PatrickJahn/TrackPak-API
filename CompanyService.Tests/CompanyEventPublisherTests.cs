@@ -5,6 +5,7 @@ using Shared.Messaging;
 using Shared.Messaging.Events.Company;
 using Shared.Messaging.Topics;
 using Shared.Models;
+using Company = CompanyService.Domain.Entities.Company;
 
 namespace CompanyService.Tests;
 

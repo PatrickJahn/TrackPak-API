@@ -1,6 +1,4 @@
 using CompanyService.Application.Interfaces;
-using CompanyService.Application.Models;
-using CompanyService.Domain.Entities;
 using Shared.Messaging;
 using Shared.Messaging.Events.Company;
 using Shared.Messaging.Topics;
@@ -10,7 +8,7 @@ namespace CompanyService.Infrastructure.Messaging;
 
 public class CompanyEventPublisher(IMessageBus messageBus) : ICompanyEventPublisher
 {
-    public  async Task PublishCompanyCreatedAsync(Company company, CreateLocationRequestModel locationRequest)
+    public  async Task PublishCompanyCreatedAsync(Domain.Entities.Company company, CreateLocationRequestModel locationRequest)
     {
 
         var @event = new CompanyCreatedEvent()

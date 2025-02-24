@@ -23,6 +23,7 @@ using UserService.Application.Models;
 using UserService.Domain.entities;
 using UserService.Domain.Repositories;
 using UserService.Infrastructure.Messaging;
+using Company = CompanyService.Domain.Entities.Company;
 
 namespace TrackPak.IntegrationTests;
 

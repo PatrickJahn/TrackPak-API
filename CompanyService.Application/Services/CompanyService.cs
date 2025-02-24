@@ -2,7 +2,6 @@ using CompanyService.Application.Interfaces;
 using CompanyService.Application.Models;
 using CompanyService.Domain.Entities;
 using CompanyService.Domain.Interfaces;
-using Company = Shared.Models.Company;
 
 namespace CompanyService.Application.Services;
 

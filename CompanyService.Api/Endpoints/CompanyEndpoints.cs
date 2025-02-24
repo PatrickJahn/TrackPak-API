@@ -29,22 +29,43 @@ public static class CompanyEndpoints
         return Results.Ok(createdCompany);
     }
 
-    private static async Task<Results<Ok<Company>, NotFound>> GetCompanyByIdAsync(
+    private static async Task<Results<Ok<Shared.Models.Company>, NotFound>> GetCompanyByIdAsync(
         Guid companyId,
         ICompanyService companyService,
         CancellationToken cancellationToken)
     {
-        var company = await companyService.GetCompanyByIdAsync(companyId, cancellationToken);
-        return company != null ? TypedResults.Ok(company) : TypedResults.NotFound();
+        var companyEntity = await companyService.GetCompanyByIdAsync(companyId, cancellationToken);
+
+        if (companyEntity != null)
+        {
+            var companyDto = MapToDto(companyEntity);
+            return TypedResults.Ok(companyDto);
+        }
+
+        return TypedResults.NotFound();
     }
 
-    private static async Task<Ok<IEnumerable<Company>>> GetCompaniesAsync(
+    private static async Task<Ok<IEnumerable<Shared.Models.Company>>> GetCompaniesAsync(
         ICompanyService companyService,
         CancellationToken cancellationToken)
     {
-        var companies = await companyService.GetCompaniesAsync(cancellationToken);
-        return TypedResults.Ok(companies);
+        var companyEntities = await companyService.GetCompaniesAsync(cancellationToken);
+        var companiesDto = companyEntities.Select(MapToDto);
+        return TypedResults.Ok(companiesDto);
     }
+
+    private static Shared.Models.Company MapToDto(CompanyService.Domain.Entities.Company company)
+    {
+        return new Shared.Models.Company
+        {
+            Id = company.Id,
+            Cvr = company.Cvr,
+            BrandId = company.BrandId,
+            Name = company.Name,
+            LocationId = company.LocationId
+        };
+    }
+
 
     private static async Task<Results<Ok, NotFound>> UpdateCompanyAsync(
         Guid companyId,
