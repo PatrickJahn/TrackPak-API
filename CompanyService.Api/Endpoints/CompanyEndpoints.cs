@@ -26,7 +26,7 @@ public static class CompanyEndpoints
         CancellationToken cancellationToken)
     {
         var createdCompany = await companyService.CreateCompanyAsync(company, cancellationToken);
-        return createdCompany != null ? TypedResults.Created($"/companies/{createdCompany.CompanyId}", createdCompany) 
+        return createdCompany != null ? TypedResults.Created($"/companies/{createdCompany.Id}", createdCompany) 
                                       : TypedResults.BadRequest("Failed to create company.");
     }
 
