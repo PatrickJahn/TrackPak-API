@@ -1,3 +1,4 @@
+using Shared.Middelware;
 using UserService.Api.Endpoints;
 using UserService.Application;
 using UserService.Infrastructure;
@@ -20,6 +21,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

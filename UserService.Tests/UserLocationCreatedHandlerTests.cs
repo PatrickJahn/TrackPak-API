@@ -2,11 +2,11 @@ using FluentAssertions;
 using Moq;
 using Shared.Messaging.Events.Location;
 using UserService.Application.Messaging.Handlers;
-using UserService.Application.Repositories;
+using UserService.Domain.Repositories;
 using UserService.Domain.entities;
 
 namespace UserService.Tests;
-
+[Trait("Category", "UnitTests")]
 public class UserLocationCreatedHandlerTests
 {
     private readonly Mock<IUserRepository> _mockUserRepository;

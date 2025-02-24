@@ -7,20 +7,24 @@ using Xunit;
 using System.Collections.Generic;
 using CompanyService.Application.Models;
 using CompanyService.Domain.Interfaces;
-using Company = Shared.Models.Company;
+using Shared.Models;
 
 namespace CompanyService.Tests;
 
+[Trait("Category", "UnitTests")]
 public class CompanyServiceTests
     {
         
        private readonly Mock<ICompanyRepository> _mockCompanyRepository;
+       private readonly Mock<ICompanyEventPublisher> _companyEventPublisherMock;
+
        private readonly Application.Services.CompanyService _companyService;
 
     public CompanyServiceTests()
     {
         _mockCompanyRepository = new Mock<ICompanyRepository>();
-        _companyService = new Application.Services.CompanyService(_mockCompanyRepository.Object);
+        _companyEventPublisherMock = new Mock<ICompanyEventPublisher>();
+        _companyService = new Application.Services.CompanyService(_mockCompanyRepository.Object, _companyEventPublisherMock.Object);
     }
 
     [Fact]
@@ -176,4 +180,36 @@ public class CompanyServiceTests
         _mockCompanyRepository.Verify(repo => repo.DeleteByIdAsync(companyId), Times.Once);
     }
     
+    [Fact]
+    public async Task CreateCompanyAsync_ShouldCallEventPublisher_WhenCompanyIsCreated()
+    {
+        // Arrange
+        var model = new CreateCompanyModel
+        {
+            Name = "Test Company",
+            Cvr = "12345678",
+            BrandId = "Brand123",
+            Location = new CreateLocationRequestModel
+            {
+                City = "Copenhagen",
+                Country = "Denmark"
+            }
+        };
+
+        _mockCompanyRepository
+            .Setup(repo => repo.AddAsync(It.IsAny<Company>()))
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _companyService.CreateCompanyAsync(model, CancellationToken.None);
+
+        // Assert
+        _companyEventPublisherMock.Verify(
+            publisher => publisher.PublishCompanyCreatedAsync(
+                It.Is<Company>(c => c.Cvr == model.Cvr && c.Name == model.Name), 
+                It.Is<CreateLocationRequestModel>(l => l.City == model.Location.City && l.Country == model.Location.Country)
+            ), 
+            Times.Once
+        );
+    }
 }

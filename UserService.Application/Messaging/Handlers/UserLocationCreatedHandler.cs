@@ -1,7 +1,7 @@
 using Shared.Messaging;
 using Shared.Messaging.Events.Location;
 using UserService.Application.Interfaces;
-using UserService.Application.Repositories;
+using UserService.Domain.Repositories;
 
 namespace UserService.Application.Messaging.Handlers;
 

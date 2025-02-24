@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Shared.Exceptions;
 using Shared.Models;
 using Shared.Interfaces;
 
@@ -20,7 +21,7 @@ public class BaseRepository<TEntity, TContext> : IBaseRepository<TEntity> where 
         
         var ret = await GetOrDefaultByIdAsync(id);
         if (ret == null)
-          throw new Exception($"Cannot find {typeof(TEntity).Name} with id {id}");
+          throw new NotFoundException($"Cannot find {typeof(TEntity).Name} with id {id}");
                 
         return ret;
     }

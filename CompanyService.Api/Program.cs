@@ -1,5 +1,7 @@
+using CompanyService.Api.Endpoints;
 using CompanyService.Application;
 using CompanyService.Infrastructure;
+using Shared.Middelware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +20,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseHttpsRedirection();
 
+app.MapCompanyEndpoints();
 
 
 app.Run();
