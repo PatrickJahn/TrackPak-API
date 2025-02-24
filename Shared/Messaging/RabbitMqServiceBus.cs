@@ -3,16 +3,11 @@ using Shared.Messaging.Topics;
 
 namespace Shared.Messaging;
 
-public class RabbitMqServiceBus : IMessageBus
+public class RabbitMqServiceBus(IBus bus) : IMessageBus
 {
     
-    private readonly IBus _bus;
+    private readonly IBus _bus = bus ?? throw new ArgumentNullException(nameof(bus));
 
-    public RabbitMqServiceBus(IBus bus)
-    {
-        _bus = bus ?? throw new ArgumentNullException(nameof(bus));
-    }
-    
     public async Task PublishAsync<T>(MessageTopic topic, T message)
     {
         //TODO: Add retry or circuit breaker logic 

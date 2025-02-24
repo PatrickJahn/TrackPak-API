@@ -1,6 +1,5 @@
-using CompanyService.Domain.Entities;
-using Shared.Messaging.Events.Company;
 using Shared.Models;
+using Company = CompanyService.Domain.Entities.Company;
 
 namespace CompanyService.Application.Interfaces;
 
