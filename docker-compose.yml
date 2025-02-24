@@ -68,6 +68,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__Postgres=Host=user-db;Port=5432;Database=trackpak-userdb;Username=developer;Password=trackPak_dev_password
+
   route-service:
     image: trackpak-routeservice
     build:
@@ -93,9 +94,9 @@ services:
       POSTGRES_PASSWORD: trackPak_dev_password
       POSTGRES_DB: trackpak-routedb
     ports:
-      - "5433:5432"
+      - "5436:5432"
     volumes:
-      - location-db-data:/var/lib/postgresql/data
+      - route-db-data:/var/lib/postgresql/data
 
   company-db:
     image: postgres:15
@@ -155,3 +156,4 @@ volumes:
   location-db-data:
   order-db-data:
   user-db-data:
+  route-db-data:
