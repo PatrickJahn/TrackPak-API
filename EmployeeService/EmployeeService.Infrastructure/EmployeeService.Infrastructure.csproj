@@ -5,15 +5,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DF0314AA-DD4E-47C5-9DC7-8E316E73AF93}</ProjectGuid>
+    <ProjectGuid>{99B7E686-67FF-440F-A020-A98F6FB47885}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EmployeeService.Api</RootNamespace>
-    <AssemblyName>EmployeeService.Api</AssemblyName>
+    <RootNamespace>EmployeeService.Infrastructure</RootNamespace>
+    <AssemblyName>EmployeeService.Infrastructure</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -41,20 +40,16 @@
     <Reference Include="System.Xml"/>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dtos\EmployeeResponseModel.cs" />
-    <Compile Include="Endpoints\EmployeeEndpoints.cs" />
-    <Compile Include="Program.cs"/>
+    <Compile Include="DbContext\EmployeeDbContext.cs" />
+    <Compile Include="dependencyInjection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs"/>
+    <Compile Include="Repositories\EmployeeRepository.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Dockerfile" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\.dockerignore">
-      <Link>.dockerignore</Link>
-      <DependentUpon>Dockerfile</DependentUpon>
-    </Content>
-    <Content Include="EmployeeService.Api.http" />
+    <Content Include="dbSetupScript.sh" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

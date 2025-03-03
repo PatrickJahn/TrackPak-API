@@ -5,15 +5,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DF0314AA-DD4E-47C5-9DC7-8E316E73AF93}</ProjectGuid>
+    <ProjectGuid>{68C3CB7F-3A88-4788-AD9D-5EAC03AB7ACD}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EmployeeService.Api</RootNamespace>
-    <AssemblyName>EmployeeService.Api</AssemblyName>
+    <RootNamespace>EmployeeService.Tests</RootNamespace>
+    <AssemblyName>EmployeeService.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -41,20 +40,8 @@
     <Reference Include="System.Xml"/>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dtos\EmployeeResponseModel.cs" />
-    <Compile Include="Endpoints\EmployeeEndpoints.cs" />
-    <Compile Include="Program.cs"/>
+    <Compile Include="EmployeeServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs"/>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Dockerfile" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\.dockerignore">
-      <Link>.dockerignore</Link>
-      <DependentUpon>Dockerfile</DependentUpon>
-    </Content>
-    <Content Include="EmployeeService.Api.http" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
