@@ -18,7 +18,8 @@ public static class EmployeeEndpoints
     app.MapPost("employee", async ([FromBody] CreateEmployeeModel request, IEmployeeService service) =>
     {
       await service.CreateEmployeeAsync(request);
-      return Results.Created($"/employee/{request.Id}", request);
+      return Results.Ok();
+      
     });
         
     app.MapPut("employee/{id}", async (Guid id, [FromBody] UpdateEmployeeModel employeeModel, IEmployeeService service) =>

@@ -14,16 +14,14 @@ namespace EmployeeService.Tests;
 public class EmployeeServiceTests
 {
     private readonly Mock<IEmployeeRepository> _employeeRepoMock;
-    private readonly Mock<ILocationServiceClient> _locationClientMock;
 
     private readonly EmployeeService.Application.Services.EmployeeService _employeeService;
 
     public EmployeeServiceTests()
     {
         _employeeRepoMock = new Mock<IEmployeeRepository>();
-        _locationClientMock = new Mock<ILocationServiceClient>();
 
-        _employeeService = new EmployeeService.Application.Services.EmployeeService(_employeeRepoMock.Object, _locationClientMock.Object );
+        _employeeService = new EmployeeService.Application.Services.EmployeeService(_employeeRepoMock.Object);
     }
 
     [Fact]
@@ -124,34 +122,5 @@ public class EmployeeServiceTests
             e.PhoneNumber == "123456789")), Times.Once);
     }
     
-    [Fact]
-    public async Task CreateEmployee_ShouldContinue_IfLocationServiceIsDown()
-    {
-        // Arrange
-        var createEmployeeModel = new CreateEmployeeModel
-        {
-            FirstName = "Alice",
-            LastName = "Johnson",
-            Email = "alice@example.com",
-            PhoneNumber = "123456789",
-            Location = new CreateLocationRequestModel(){City = "New York", Country = "USA", AddressLine = "New York, USA", PostalCode = "12345"}
-        };
-
-        _locationClientMock.Setup(repo => repo.CreateLocationAsync(It.IsAny<CreateLocationRequestModel>()))
-            .Throws(new Exception());
-        
-        _employeeRepoMock.Setup(repo => repo.AddAsync(It.IsAny<Employee>()))
-            .Returns(Task.CompletedTask);
-
-        // Act
-        await _employeeService.CreateEmployee(createEmployeeModel);
-
-        // Assert - repo should still be called and locationId set to null 
-        _employeeRepoMock.Verify(repo => repo.AddAsync(It.Is<Employee>(e => 
-            e.FirstName == "Alice" && 
-            e.LastName == "Johnson" && 
-            e.Email == "alice@example.com" &&
-            e.PhoneNumber == "123456789" && 
-            e.LocationId == null)), Times.Once);
-    }
+  
 }

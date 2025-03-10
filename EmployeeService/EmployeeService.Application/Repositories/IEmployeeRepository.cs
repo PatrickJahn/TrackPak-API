@@ -1,5 +1,5 @@
 using Shared.Interfaces;
-using EmployeeService.Domain.entities;
+using EmployeeService.Domain.Entities;
 
 namespace EmployeeService.Application.Repositories;
 

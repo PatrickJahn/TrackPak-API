@@ -17,11 +17,7 @@ public static class DependencyInjection
         services.AddDbContext<EmployeeDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Postgres")));
        
-        services.AddHttpClient<ILocationServiceClient, LocationServiceClient>(client =>
-        {
-            client.BaseAddress = new Uri("http://locationservice-api"); // Replace with actual URL
-        });
-        
+    
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 

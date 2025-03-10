@@ -10,12 +10,10 @@ namespace EmployeeService.Application.Services;
 public class EmployeeService : IEmployeeService
 {
   private readonly IEmployeeRepository _employeeRepo;
-  private readonly ILocationServiceClient _locationServiceClient;
 
-  public EmployeeService(IEmployeeRepository employeeRepo, ILocationServiceClient locationServiceClient)
+  public EmployeeService(IEmployeeRepository employeeRepo)
   {
     _employeeRepo = employeeRepo ?? throw new ArgumentNullException(nameof(employeeRepo));
-    _locationServiceClient = locationServiceClient ?? throw new ArgumentNullException(nameof(locationServiceClient));
   }
 
   public async Task<Employee> GetEmployeeByIdAsync(Guid employeeId)
@@ -37,18 +35,24 @@ public class EmployeeService : IEmployeeService
     return employee;
   }
 
+  public Task<Employee> UpdateEmployeeLocationAsync(Guid employeeId, UpdateLocationModel locationModel)
+  {
+    throw new NotImplementedException();
+  }
+
   public async Task DeleteEmployeeAsync(Guid employeeId)
   {
     await _employeeRepo.DeleteByIdAsync(employeeId);
   }
 
+  public Task CreateEmployeeAsync(CreateEmployeeModel employeeModel)
+  {
+    throw new NotImplementedException();
+  }
+
   public async Task CreateEmployee(CreateEmployeeModel employeeModel)
   {
-    var locationId = await CreateLocation(employeeModel.Location);
+    throw new NotImplementedException();
 
-    await _employeeRepo.AddAsync(new Employee
-    {
-      PhoneNumber = employeeModel.PhoneNumber,
-      Email = employeeModel.Email,
-      FirstName = employeeModel.FirstName,
-      LastName = employeeModel.LastName,
+  }
+}
