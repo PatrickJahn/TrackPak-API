@@ -46,14 +46,23 @@ public class EmployeeService : IEmployeeService
     await _employeeRepo.DeleteByIdAsync(employeeId);
   }
 
-  public Task CreateEmployeeAsync(CreateEmployeeModel employeeModel)
+  public async Task CreateEmployeeAsync(CreateEmployeeModel employeeModel)
   {
-    throw new NotImplementedException();
+    // TODO:
+    // await CheckIfUserExistWithEmail(userModel.Email, cancellationToken);
+    // await CheckIfUserExistWithPhone(userModel.PhoneNumber, cancellationToken);
+
+    var emp = new Employee()
+    {
+      FirstName = employeeModel.FirstName,
+      LastName = employeeModel.LastName,
+      PhoneNumber = employeeModel.PhoneNumber,
+      Email = employeeModel.Email,
+      LocationId = null
+    };
+    
+    await _employeeRepo.AddAsync(emp);
   }
 
-  public async Task CreateEmployee(CreateEmployeeModel employeeModel)
-  {
-    throw new NotImplementedException();
-
-  }
+ 
 }

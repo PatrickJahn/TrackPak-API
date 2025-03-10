@@ -107,13 +107,12 @@ public class EmployeeServiceTests
             Location = null
         };
 
-        var locationId = Guid.NewGuid();
 
         _employeeRepoMock.Setup(repo => repo.AddAsync(It.IsAny<Employee>()))
                          .Returns(Task.CompletedTask);
 
         // Act
-        await _employeeService.CreateEmployee(createEmployeeModel);
+        await _employeeService.CreateEmployeeAsync(createEmployeeModel);
 
         // Assert
         _employeeRepoMock.Verify(repo => repo.AddAsync(It.Is<Employee>(e => 

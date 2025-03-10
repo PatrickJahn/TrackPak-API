@@ -80,6 +80,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteService.Infrastructure", "RouteService.Infrastructure\RouteService.Infrastructure.csproj", "{42F13F7B-95E6-49BF-90EE-36F946B878CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteService.Tests", "RouteService.Tests\RouteService.Tests.csproj", "{664C3899-2B9C-4D3C-92E3-1C307A9C8D24}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateway", "ApiGateway", "{C68F8E25-CD6F-47C6-8743-F9084738AD41}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{988DFC2F-F397-45BB-BD2A-606193755E3C}"
