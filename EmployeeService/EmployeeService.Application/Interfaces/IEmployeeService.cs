@@ -1,6 +1,7 @@
 using Shared.Models;
 using EmployeeService.Application.Models;
 using EmployeeService.Domain.Entities;
+using Employee = EmployeeService.Domain.Entities.Employee;
 
 namespace EmployeeService.Application.Interfaces;
 

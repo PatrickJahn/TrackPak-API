@@ -8,9 +8,6 @@ public class EmployeeDbContext(DbContextOptions<EmployeeDbContext> options) : Mi
     
   public DbSet<Employee> Employees { get; set; }
   
-  protected override void OnModelCreating(ModelBuilder modelBuilder)
-  {
-      base.OnModelCreating(modelBuilder);
-  }
-
 }
+
+

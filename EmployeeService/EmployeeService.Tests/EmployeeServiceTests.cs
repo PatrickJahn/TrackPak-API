@@ -8,6 +8,7 @@ using Shared.Services;
 using EmployeeService.Application.Models;
 using EmployeeService.Application.Repositories;
 using EmployeeService.Domain.Entities;
+using Employee = EmployeeService.Domain.Entities.Employee;
 
 namespace EmployeeService.Tests;
 

@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Shared.Models;
-using Shared.Interfaces;
 
 namespace EmployeeService.Domain.Entities;
 

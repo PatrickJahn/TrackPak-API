@@ -19,7 +19,6 @@ public static class DependencyInjection
        
     
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
         // Ensure migrations are applied
         // Ensure migrations are applied in non-production environments

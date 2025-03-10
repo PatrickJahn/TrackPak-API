@@ -23,7 +23,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
 app.MapEmployeeEndpoints();
 
 app.Run();
