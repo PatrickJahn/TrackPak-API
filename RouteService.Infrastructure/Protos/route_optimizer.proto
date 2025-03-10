@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option csharp_namespace = "RouteService.Grpc";
+
+service RouteOptimizerService {
+  rpc OptimizeRoute (OptimizeRouteRequest) returns (OptimizeRouteResponse);
+}
+
+message OptimizeRouteRequest {
+  string route_id = 1;
+  repeated string order_ids = 2;
+}
+
+message OptimizeRouteResponse {
+  bool success = 1;
+}

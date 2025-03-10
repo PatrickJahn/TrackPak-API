@@ -1,0 +1,6 @@
+@ApiGateway_HostAddress = http://localhost:5056
+
+GET {{ApiGateway_HostAddress}}/api/users/
+Accept: application/json
+
+###

@@ -1,10 +1,13 @@
+using EasyNetQ;
 using LocationService.Application.Interfaces.Repositories;
 using LocationService.Infrastructure.DBContext;
+using LocationService.Infrastructure.Messaging;
 using LocationService.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shared.Messaging;
 
 namespace LocationService.Infrastructure;
 
@@ -13,10 +16,27 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         
+        // DB config
         services.AddDbContext<LocationDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Postgres")));
 
+        
+        // ServiceBus config (RabbitMq)
+        if (configuration.GetSection("ServiceBus").GetValue<bool>("useMock"))
+        {
+            services.AddSingleton<IMessageBus, MockRabbitMqServiceBus>();
+        }
+        else
+        {
+            services.AddEasyNetQ(configuration.GetConnectionString("RabbitMQ") ?? throw new InvalidOperationException());
+            services.AddSingleton<IMessageBus, RabbitMqServiceBus>();
+        }
+        services.AddHostedService<MessageConsumerService>(); // Background listening service:))
+        
+        
+        // Repositories
         services.AddScoped<ILocationRepository, LocationRepository>();
+        
         
         // Ensure migrations are applied
         // Ensure migrations are applied in non-production environments

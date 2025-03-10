@@ -1,0 +1,54 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/companies/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "company-service", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/companies/{everything}",
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+    },
+    {
+      "DownstreamPathTemplate": "/location/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "location-service", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/location/{everything}",
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+    },
+  
+    {
+      "DownstreamPathTemplate": "/orders/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "order-service", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/orders/{everything}",
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+    },
+    {
+      "DownstreamPathTemplate": "/users/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "user-service", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/users/{everything}",
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+    },
+    {
+      "DownstreamPathTemplate": "/employees/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "employee-service", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/employees/{everything}",
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+    },
+    {
+      "DownstreamPathTemplate": "/routes/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "route-service", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/routes/{everything}",
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+    },
+    {
+      "DownstreamPathTemplate": "/tracking/ws",
+      "DownstreamScheme": "ws",
+      "DownstreamHostAndPorts": [{ "Host": "tracking-service", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/tracking/ws"
+    }
+  ]
+  
+}

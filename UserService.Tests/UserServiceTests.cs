@@ -4,29 +4,34 @@ using System.Threading.Tasks;
 using Xunit;
 using Moq;
 using FluentAssertions;
+using Shared.Exceptions;
+using Shared.Messaging;
+using Shared.Messaging.Events.User;
+using Shared.Messaging.Topics;
 using Shared.Models;
 using Shared.Services;
+using UserService.Application.Interfaces;
 using UserService.Application.Models;
-using UserService.Application.Repositories;
+using UserService.Domain.Repositories;
 using UserService.Domain.entities;
 
 
 namespace UserService.Tests;
 
-
+    [Trait("Category", "UnitTests")]
     public class UserServiceTests
     {
         private readonly Mock<IUserRepository> _userRepoMock;
-        private readonly Mock<ILocationServiceClient> _locationClientMock;
+        private readonly Mock<IUserEventPublisher> _userEventPublisherMock;
 
         private readonly UserService.Application.Services.UserService _userService;
 
         public UserServiceTests()
         {
             _userRepoMock = new Mock<IUserRepository>();
-            _locationClientMock = new Mock<ILocationServiceClient>();
+            _userEventPublisherMock = new Mock<IUserEventPublisher>();
 
-            _userService = new UserService.Application.Services.UserService(_userRepoMock.Object, _locationClientMock.Object );
+            _userService = new UserService.Application.Services.UserService(_userRepoMock.Object,  _userEventPublisherMock.Object);
         }
 
         [Fact]
@@ -40,7 +45,7 @@ namespace UserService.Tests;
                          .ReturnsAsync(expectedUser);
 
             // Act
-            var result = await _userService.GetUserByIdAsync(userId);
+            var result = await _userService.GetUserByIdAsync(userId, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
@@ -65,7 +70,7 @@ namespace UserService.Tests;
                          .Returns(Task.CompletedTask);
 
             // Act
-            var result = await _userService.UpdateUserAsync(userId, updateModel);
+            var result = await _userService.UpdateUserAsync(userId, updateModel, CancellationToken.None);
 
             // Assert
             result.Should().NotBeNull();
@@ -92,7 +97,7 @@ namespace UserService.Tests;
                          .Returns(Task.CompletedTask);
 
             // Act
-            await _userService.DeleteUserAsync(userId);
+            await _userService.DeleteUserAsync(userId, CancellationToken.None);
 
             // Assert
             _userRepoMock.Verify(repo => repo.DeleteByIdAsync(userId), Times.Once);
@@ -111,13 +116,12 @@ namespace UserService.Tests;
                 Location = null
             };
 
-            var locationId = Guid.NewGuid();
 
             _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
                          .Returns(Task.CompletedTask);
 
             // Act
-            await _userService.CreateUser(createUserModel);
+            await _userService.CreateUser(createUserModel, CancellationToken.None);
 
             // Assert
             _userRepoMock.Verify(repo => repo.AddAsync(It.Is<User>(u => 
@@ -128,35 +132,152 @@ namespace UserService.Tests;
         }
         
         [Fact]
-        public async Task CreateUser_ShouldContinue_IfLocationServiceIsDown()
+        public async Task CreateUser_Should_Call_AddAsync_And_PublishEvent()
         {
             // Arrange
-            var createUserModel = new CreateUserModel
+            var userModel = new CreateUserModel
             {
-                FirstName = "Alice",
-                LastName = "Johnson",
-                Email = "alice@example.com",
                 PhoneNumber = "123456789",
-                Location = new CreateLocationRequestModel(){City = "New York", Country = "USA", AddressLine = "New York, USA", PostalCode = "12345"}
+                Email = "test@example.com",
+                FirstName = "John",
+                LastName = "Doe",
+                Location = { }
             };
 
-            _locationClientMock.Setup(repo => repo.CreateLocationAsync(It.IsAny<CreateLocationRequestModel>()))
-                .Throws(new Exception());
-            
-            _userRepoMock.Setup(repo => repo.AddAsync(It.IsAny<User>()))
+            _userRepoMock
+                .Setup(repo => repo.AddAsync(It.IsAny<User>()))
+                .Returns(Task.CompletedTask);
+
+            _userEventPublisherMock
+                .Setup(pub => pub.PublishUserCreatedAsync(It.IsAny<User>(), It.IsAny<CreateLocationRequestModel>()))
                 .Returns(Task.CompletedTask);
 
             // Act
-            await _userService.CreateUser(createUserModel);
+            await _userService.CreateUser(userModel, CancellationToken.None);
 
-            // Assert - repo should still be called and locationId set to null 
-            _userRepoMock.Verify(repo => repo.AddAsync(It.Is<User>(u => 
-                u.FirstName == "Alice" && 
-                u.LastName == "Johnson" && 
-                u.Email == "alice@example.com" &&
-                u.PhoneNumber == "123456789" && 
+            // Assert
+            _userRepoMock.Verify(repo => repo.AddAsync(It.Is<User>(u =>
+                u.Email == userModel.Email &&
+                u.PhoneNumber == userModel.PhoneNumber &&
+                u.FirstName == userModel.FirstName &&
+                u.LastName == userModel.LastName &&
                 u.LocationId == null)), Times.Once);
+
+            _userEventPublisherMock.Verify(pub => pub.PublishUserCreatedAsync(It.Is<User>(u =>
+                u.Email == userModel.Email &&
+                u.PhoneNumber == userModel.PhoneNumber &&
+                u.FirstName == userModel.FirstName &&
+                u.LastName == userModel.LastName
+             ), It.IsAny<CreateLocationRequestModel>()), Times.Once);
         }
+        
+        [Fact]
+    public async Task UpdateUserAsync_ValidData_UpdatesUser()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var userModel = new UpdateUserModel
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "john.doe@example.com",
+            PhoneNumber = "1234567890"
+        };
+        var existingUser = new User
+        {
+            Id = userId,
+            FirstName = "OldName",
+            LastName = "OldLastName",
+            Email = "old.email@example.com",
+            PhoneNumber = "9876543210"
+        };
+
+        _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(existingUser);
+        _userRepoMock.Setup(repo => repo.Update(It.IsAny<User>())).Returns(Task.CompletedTask);
+        _userRepoMock.Setup(repo => repo.GetByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((User)null); // No user with this email
+        _userRepoMock.Setup(repo => repo.GetByPhoneAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((User)null); // No user with this phone number
+
+        // Act
+        var updatedUser = await _userService.UpdateUserAsync(userId, userModel, CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(updatedUser);
+        Assert.Equal(userModel.FirstName, updatedUser.FirstName);
+        Assert.Equal(userModel.LastName, updatedUser.LastName);
+        Assert.Equal(userModel.Email, updatedUser.Email);
+        Assert.Equal(userModel.PhoneNumber, updatedUser.PhoneNumber);
+
+        _userRepoMock.Verify(repo => repo.Update(It.IsAny<User>()), Times.Once);
+    }
+
+    
+
+    [Fact]
+    public async Task UpdateUserAsync_EmailAlreadyInUse_ThrowsException()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var userModel = new UpdateUserModel
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "john.doe@example.com",
+            PhoneNumber = "1234567890"
+        };
+
+        var existingUser = new User
+        {
+            Id = userId,
+            FirstName = "OldName",
+            LastName = "OldLastName",
+            Email = "old.email@example.com",
+            PhoneNumber = "9876543210"
+        };
+
+        _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(existingUser);
+        _userRepoMock.Setup(repo => repo.Update(It.IsAny<User>())).Returns(Task.CompletedTask);
+        _userRepoMock.Setup(repo => repo.GetByEmailAsync(userModel.Email, It.IsAny<CancellationToken>())).ReturnsAsync(existingUser); // Email already in use
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ConflictException>(() =>
+            _userService.UpdateUserAsync(userId, userModel, CancellationToken.None)
+        );
+    }
+
+    [Fact]
+    public async Task UpdateUserAsync_PhoneNumberAlreadyInUse_ThrowsException()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var userModel = new UpdateUserModel
+        {
+            FirstName = "John",
+            LastName = "Doe",
+            Email = "john.doe@example.com",
+            PhoneNumber = "1234567890"
+        };
+
+        var existingUser = new User
+        {
+            Id = userId,
+            FirstName = "OldName",
+            LastName = "OldLastName",
+            Email = "old.email@example.com",
+            PhoneNumber = "9876543210"
+        };
+
+        _userRepoMock.Setup(repo => repo.GetByIdAsync(userId)).ReturnsAsync(existingUser);
+        _userRepoMock.Setup(repo => repo.Update(It.IsAny<User>())).Returns(Task.CompletedTask);
+        _userRepoMock.Setup(repo => repo.GetByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((User)null); // No user with this email
+        _userRepoMock.Setup(repo => repo.GetByPhoneAsync(userModel.PhoneNumber, It.IsAny<CancellationToken>())).ReturnsAsync(existingUser); // Phone already in use
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ConflictException>(() =>
+            _userService.UpdateUserAsync(userId, userModel, CancellationToken.None)
+        );
+    }
+        
+    
     }
 
 
