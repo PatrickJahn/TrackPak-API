@@ -1,3 +1,5 @@
+using EasyNetQ;
+using EmployeeService.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -5,7 +7,9 @@ using Microsoft.Extensions.Hosting;
 using Shared.Services;
 using EmployeeService.Application.Repositories;
 using EmployeeService.Infrastructure.DbContext;
+using EmployeeService.Infrastructure.Messaging;
 using EmployeeService.Infrastructure.Repositories;
+using Shared.Messaging;
 
 namespace EmployeeService.Infrastructure;
 
@@ -17,7 +21,22 @@ public static class DependencyInjection
         services.AddDbContext<EmployeeDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Postgres")));
        
+        // ServiceBus config (RabbitMq)
+        if (configuration.GetSection("ServiceBus").GetValue<bool>("useMock"))
+        {
+            services.AddSingleton<IMessageBus, MockRabbitMqServiceBus>();
+        }
+        else
+        {
+            services.AddEasyNetQ(configuration.GetConnectionString("RabbitMQ") ?? throw new InvalidOperationException());
+            services.AddSingleton<IMessageBus, RabbitMqServiceBus>();
+        }
+        services.AddHostedService<MessageConsumerService>(); // Background listening service:))
+
+        services.AddScoped<IEmployeeEventPublisher, EmployeeEventPublisher>();
     
+        
+        // Repos
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
         // Ensure migrations are applied

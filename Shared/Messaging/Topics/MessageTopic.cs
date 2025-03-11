@@ -19,6 +19,9 @@ public enum MessageTopic
     EmployeeCreated = 30,
     EmployeeDeleted = 31,
     EmployeeLocationUpdated = 32,
+    EmployeeCheckedIn = 33,
+    EmployeeCheckedOut = 34,
+
 
 
     // Order Events
@@ -31,7 +34,5 @@ public enum MessageTopic
     CompanyCreated = 50,
     CompanyUpdated = 51,
     CompanyLocationUpdated = 52,
-
-
-
+    
 }

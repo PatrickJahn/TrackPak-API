@@ -4,6 +4,6 @@ namespace Shared.Messaging.Events.Employee;
 
 public class EmployeeCreatedEvent
 {
-    public Guid EmployeeId { get; }
-    public CreateLocationRequestModel Location { get; }
+    public Guid EmployeeId { get; set; }
+    public CreateLocationRequestModel Location { get; set; }
 }

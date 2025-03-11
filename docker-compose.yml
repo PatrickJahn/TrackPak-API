@@ -76,24 +76,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__Postgres=Host=order-db;Port=5432;Database=trackpak-orderdb;Username=developer;Password=trackPak_dev_password
   
-  order-service:
-    image: trackpak-orderservice
-      image: trackpak-orderservice
-      build:
-        context: .
-        dockerfile: OrderService.Api/Dockerfile
-      depends_on:
-        - rabbitmq
-        - order-db
-      deploy:
-        replicas: 2
-      restart: unless-stopped
-      environment:
-        - ASPNETCORE_ENVIRONMENT=Development
-        - ConnectionStrings__Postgres=Host=order-db;Port=5432;Database=trackpak-orderdb;Username=developer;Password=trackPak_dev_password
-      networks:
-        - trackpak-network
-    
+
   user-service:
       image: trackpak-userservice
       build:
