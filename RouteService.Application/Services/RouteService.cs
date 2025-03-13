@@ -3,9 +3,7 @@ using RouteService.Domain.Entities;
 using RouteService.Domain.Interfaces;
 using Shared.Messaging.Events.Order;
 using Shared.Messaging.Events.Employee;
-using RouteService.Domain.Enums;
-using System.Linq;
-using System.Threading.Tasks;
+using Shared.Enums;
 
 namespace RouteService.Application.Services;
 

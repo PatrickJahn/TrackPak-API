@@ -1,4 +1,4 @@
-using RouteService.Domain.Enums;
+using Shared.Enums;
 using Shared.Models;
 
 namespace RouteService.Domain.Entities;

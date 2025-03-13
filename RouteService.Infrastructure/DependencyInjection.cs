@@ -1,3 +1,4 @@
+using EasyNetQ;
 using Grpc.Net.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +22,17 @@ public static class DependencyInjection
         services.AddDbContext<RouteDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Postgres")));
         
+        // ServiceBus config (RabbitMq)
+        if (configuration.GetSection("ServiceBus").GetValue<bool>("useMock"))
+        {
+            services.AddSingleton<IMessageBus, MockRabbitMqServiceBus>();
+        }
+        else
+        {
+            services.AddEasyNetQ(configuration.GetConnectionString("RabbitMQ") ?? throw new InvalidOperationException());
+            services.AddSingleton<IMessageBus, RabbitMqServiceBus>();
+        }
+        
         var grpcChannel = GrpcChannel.ForAddress(configuration["Grpc:RouteOptimizer"]);
         services.AddSingleton(grpcChannel);
         services.AddScoped<GrpcRouteOptimizerClient>(); 
@@ -29,8 +41,12 @@ public static class DependencyInjection
         services.AddScoped<IRouteRepository, RouteRepository>();
         services.AddScoped<IRouteService, RouteService.Application.Services.RouteService>();
         services.AddScoped<IRouteOptimizer, RouteOptimizer>(); // gRPC Optimization
-       // services.AddScoped<IMessageBus, RabbitMqServiceBus>(); // RabbitMQ Messaging
-      /// services.AddHostedService<RouteEventListener>(); // Event Listener Background Service
+       
+        services.AddHostedService<MessageConsumerService>(); // Background listening service:))
+
+
+        services.AddScoped<IRouteEventPublisher, RouteEventPublisher>();
+
     
 
         // Ensure migrations are applied in non-production environments
