@@ -5,43 +5,66 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "company-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/companies/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": ["read:companies", "write:companies"]
+      }
     },
     {
       "DownstreamPathTemplate": "/location/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "location-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/location/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": ["read:location", "write:location"]
+      }
     },
-  
     {
       "DownstreamPathTemplate": "/orders/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "order-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/orders/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": ["read:orders", "write:orders"]
+      }
     },
     {
       "DownstreamPathTemplate": "/users/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "user-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/users/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": ["read:users", "write:users"]
+      }
     },
     {
       "DownstreamPathTemplate": "/employees/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "employee-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/employees/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": ["read:employees", "write:employees"]
+      }
     },
     {
       "DownstreamPathTemplate": "/routes/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "route-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/routes/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": ["read:routes", "write:routes"]
+      }
     },
     {
       "DownstreamPathTemplate": "/tracking/ws",
@@ -49,6 +72,12 @@
       "DownstreamHostAndPorts": [{ "Host": "tracking-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/tracking/ws"
     }
-  ]
-  
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://apigateway",
+    "AuthenticationOptions": {
+      "AuthenticationProviderKey": "Auth0",
+      "AllowedScopes": []
+    }
+  }
 }
