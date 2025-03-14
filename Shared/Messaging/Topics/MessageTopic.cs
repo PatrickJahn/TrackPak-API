@@ -34,5 +34,11 @@ public enum MessageTopic
     CompanyCreated = 50,
     CompanyUpdated = 51,
     CompanyLocationUpdated = 52,
-    
+
+    // RouteService Events
+    RouteCreated = 60,
+    RouteUpdated = 61,
+    RouteCompleted = 62,
+    RouteDelayed = 63
+
 }
