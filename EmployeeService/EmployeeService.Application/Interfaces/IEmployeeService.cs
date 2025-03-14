@@ -9,6 +9,8 @@ public interface IEmployeeService
 {
   public Task<Employee> GetEmployeeByIdAsync(Guid employeeId);
     
+  public Task<IEnumerable<Employee>> GetEmployeeByCompanyIdAsync(Guid companyId);
+
   public Task<Employee> UpdateEmployeeAsync(Guid employeeId, UpdateEmployeeModel employeeModel);
     
   public Task<Employee> UpdateEmployeeLocationAsync(Guid employeeId, UpdateLocationModel locationModel);
