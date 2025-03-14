@@ -25,7 +25,6 @@ public static class EmployeeEndpoints
     {
       await service.CreateEmployeeAsync(request);
       return Results.Ok();
-      
     });
         
     app.MapPut("employee/{id}", async (Guid id, [FromBody] UpdateEmployeeModel employeeModel, IEmployeeService service) =>
