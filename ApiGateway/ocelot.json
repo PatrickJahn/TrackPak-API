@@ -9,6 +9,10 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
         "AllowedScopes": ["read:companies", "write:companies"]
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
       }
     },
     {
@@ -20,6 +24,10 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
         "AllowedScopes": ["read:location", "write:location"]
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
       }
     },
     {
@@ -31,6 +39,10 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
         "AllowedScopes": ["read:orders", "write:orders"]
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
       }
     },
     {
@@ -42,6 +54,10 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
         "AllowedScopes": ["read:users", "write:users"]
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
       }
     },
     {
@@ -53,6 +69,10 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
         "AllowedScopes": ["read:employees", "write:employees"]
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
       }
     },
     {
@@ -64,6 +84,10 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
         "AllowedScopes": ["read:routes", "write:routes"]
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
       }
     },
     {

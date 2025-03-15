@@ -1,4 +1,7 @@
+using ApiGateway.Security.Roles;
+using ApiGateway.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
@@ -29,19 +32,25 @@ var auth0Namespace = builder.Configuration["Auth0:Namespace"];
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Customer", policy =>
-        policy.RequireClaim($"{auth0Namespace}/claims/roles", "Customer"));
+    options.AddPolicy(PolicyRoles.SystemAdmin, policy =>
+        policy.Requirements.Add(new RoleRequirement(new[] { RoleAsString.SystemAdmin })));
 
-    options.AddPolicy("CompanyAdmin", policy =>
-        policy.RequireClaim($"{auth0Namespace}/claims/roles", "CompanyAdmin"));
+    options.AddPolicy(PolicyRoles.CompanyAdmin, policy =>
+        policy.Requirements.Add(new RoleRequirement(new[] { RoleAsString.SystemAdmin, RoleAsString.CompanyAdmin })));
 
-    options.AddPolicy("Driver", policy =>
-        policy.RequireClaim($"{auth0Namespace}/claims/roles", "Driver"));
+    options.AddPolicy(PolicyRoles.Driver, policy =>
+        policy.Requirements.Add(new RoleRequirement(new[] { RoleAsString.SystemAdmin, RoleAsString.CompanyAdmin, RoleAsString.Driver })));
 
-    options.AddPolicy("SystemAdmin", policy =>
-        policy.RequireClaim($"{auth0Namespace}/claims/roles", "SystemAdmin"));
+    options.AddPolicy(PolicyRoles.Customer, policy =>
+        policy.Requirements.Add(new RoleRequirement(new[] { RoleAsString.Customer })));
 });
 
+
+builder.Services.AddSingleton<IAuthorizationHandler, RoleHandler>();
+
+
+builder.Services.AddTransient<OcelotHeaderMiddleware>(); 
+builder.Services.AddScoped<IUserContextService, UserContextService>(); 
 
 // Add Ocelot
 builder.Services.AddOcelot(builder.Configuration);
@@ -50,6 +59,8 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseWebSockets();
+app.UseMiddleware<OcelotHeaderMiddleware>(); 
+
 app.UseOcelot().Wait();
 
 app.Run();
