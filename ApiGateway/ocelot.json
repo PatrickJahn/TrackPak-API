@@ -5,7 +5,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "company-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/companies/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"]
     },
     {
       "DownstreamPathTemplate": "/location/{everything}",

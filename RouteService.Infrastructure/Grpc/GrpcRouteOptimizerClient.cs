@@ -1,9 +1,10 @@
 using Grpc.Net.Client;
-using RouteService.Grpc;
+using RouteService.Infrastructure.Grpc;
 using RouteService.Domain.Entities;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
+using RouteService.Grpc;
 
 namespace RouteService.Infrastructure.Grpc;
 
