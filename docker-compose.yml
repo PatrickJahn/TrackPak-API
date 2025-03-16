@@ -25,17 +25,6 @@ services:
       - OCELOT_CONFIGURATION=ocelot.json # Ocelot config file
     networks:
       - trackpak-network
-      
-  ngrok:
-    image: ngrok/ngrok
-    command: http --domain=mongrel-active-completely.ngrok-free.app api-gateway:8080
-    ports:
-      - "4040:4040" # Ngrok web interface
-    environment:
-      - NGROK_AUTHTOKEN=2tAWAZpvHz1ni52Zq2KseFVhT57_64vbC2rJv2VYAHoNg6Vnr
-    networks:
-      - trackpak-network
-      
   
   company-service:
     image: trackpak-companyservice
