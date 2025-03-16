@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using CompanyService.Application.Interfaces;
 using CompanyService.Application.Models;
 using CompanyService.Domain.Entities;
-using Company = Shared.Models.Company;
 
 
 namespace CompanyService.Api.Endpoints;
@@ -29,7 +28,7 @@ public static class CompanyEndpoints
         return Results.Ok(createdCompany);
     }
 
-    private static async Task<Results<Ok<Shared.Models.Company>, NotFound>> GetCompanyByIdAsync(
+    private static async Task<Results<Ok<Company>, NotFound>> GetCompanyByIdAsync(
         Guid companyId,
         ICompanyService companyService,
         CancellationToken cancellationToken)
@@ -45,7 +44,7 @@ public static class CompanyEndpoints
         return TypedResults.NotFound();
     }
 
-    private static async Task<Ok<IEnumerable<Shared.Models.Company>>> GetCompaniesAsync(
+    private static async Task<Ok<IEnumerable<Company>>> GetCompaniesAsync(
         ICompanyService companyService,
         CancellationToken cancellationToken)
     {
@@ -54,9 +53,9 @@ public static class CompanyEndpoints
         return TypedResults.Ok(companiesDto);
     }
 
-    private static Shared.Models.Company MapToDto(CompanyService.Domain.Entities.Company company)
+    private static Company MapToDto(Company company)
     {
-        return new Shared.Models.Company
+        return new Company
         {
             Id = company.Id,
             Cvr = company.Cvr,

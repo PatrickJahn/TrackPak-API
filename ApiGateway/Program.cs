@@ -8,7 +8,6 @@ using Ocelot.Middleware;
 using Shared.Middelware;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Load Ocelot configuration
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 // Add authentication with Auth0
@@ -52,10 +51,20 @@ builder.Services.AddSingleton<IAuthorizationHandler, RoleHandler>();
 builder.Services.AddTransient<OcelotHeaderMiddleware>(); 
 builder.Services.AddScoped<IUserContextService, UserContextService>(); 
 
+// Add CORS service BEFORE using it
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
 // Add Ocelot
 builder.Services.AddOcelot(builder.Configuration);
 
 var app = builder.Build();
+
+// Enable CORS BEFORE Ocelot Middleware
+app.UseCors("AllowAll");
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseWebSockets();
