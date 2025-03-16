@@ -14,12 +14,17 @@ public static class EmployeeEndpoints
       var employee = await service.GetEmployeeByIdAsync(id);
       return Results.Ok(employee);
     });
+    
+    app.MapGet("employee/company/{companyId}", async (Guid companyId, IEmployeeService service) =>
+    {
+      var employees = await service.GetEmployeeByCompanyIdAsync(companyId);
+      return Results.Ok(employees);
+    });
         
     app.MapPost("employee", async ([FromBody] CreateEmployeeModel request, IEmployeeService service) =>
     {
       await service.CreateEmployeeAsync(request);
       return Results.Ok();
-      
     });
         
     app.MapPut("employee/{id}", async (Guid id, [FromBody] UpdateEmployeeModel employeeModel, IEmployeeService service) =>

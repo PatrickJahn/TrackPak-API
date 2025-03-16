@@ -22,6 +22,11 @@ public class EmployeeService : IEmployeeService
     return await _employeeRepo.GetByIdAsync(employeeId);
   }
 
+  public async Task<IEnumerable<Employee>> GetEmployeeByCompanyIdAsync(Guid companyId)
+  {
+    return await _employeeRepo.GetAllAsync(employee => employee.CompanyId == companyId);
+  }
+
   public async Task<Employee> UpdateEmployeeAsync(Guid employeeId, UpdateEmployeeModel employeeModel)
   {
     var employee = await _employeeRepo.GetByIdAsync(employeeId);
