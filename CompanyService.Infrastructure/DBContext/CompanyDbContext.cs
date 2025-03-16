@@ -1,6 +1,5 @@
 using CompanyService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Company = Shared.Models.Company;
 
 namespace CompanyService.Infrastructure.DBContext;
 
