@@ -11,7 +11,7 @@ public static class UserEndpoints
 {
     public static void MapUserEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/users");
+        var group = app.MapGroup("/user");
         
         group.MapPost("/", CreateUserAsync);
         group.MapGet("/{id}", GetUserByIdAsync);
@@ -23,8 +23,8 @@ public static class UserEndpoints
 
     private static async Task<IResult> CreateUserAsync([FromBody] CreateUserModel request, IUserService service, CancellationToken cancellationToken)
     {
-        await service.CreateUser(request, cancellationToken);
-        return Results.Ok();
+        var userId =  await service.CreateUser(request, cancellationToken);
+        return Results.Ok(userId);
     }
     
     private static async Task<IResult> GetUserByIdAsync(Guid id, IUserService service, CancellationToken cancellationToken)

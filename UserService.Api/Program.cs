@@ -14,6 +14,9 @@ builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 
+builder.Services.Configure<GatewaySettings>(options =>
+    options.AllowedGateways = builder.Configuration.GetSection("AllowedGateways").Get<string[]>() ?? Array.Empty<string>());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,7 +24,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
+app.UseMiddleware<GatewayRestrictionMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();

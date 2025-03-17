@@ -1,47 +1,100 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/companies/{everything}",
+      "DownstreamPathTemplate": "/company/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "company-service", "Port": 8080 }],
-      "UpstreamPathTemplate": "/api/companies/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"]
+      "UpstreamPathTemplate": "/api/company/{everything}",
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": "write:companies read:companies admin:all"
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
+      }
     },
     {
       "DownstreamPathTemplate": "/location/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "location-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/location/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": "write:location read:location admin:all"
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
+      }
     },
-  
     {
       "DownstreamPathTemplate": "/orders/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "order-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/orders/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": "read:orders write:orders admin:all"
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
+      }
     },
     {
-      "DownstreamPathTemplate": "/users/{everything}",
+      "DownstreamPathTemplate": "/user/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "user-service", "Port": 8080 }],
-      "UpstreamPathTemplate": "/api/users/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamPathTemplate": "/api/user/{everything}",
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": 
+          "read:users read:users write:users admin:all"
+      },
+      "AddClaimsToRequest": {
+        "Scope": "scope"
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
+      }
     },
     {
       "DownstreamPathTemplate": "/employees/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "employee-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/employees/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": "write:employees read:employees admin:all"
+      },
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
+      }
     },
     {
       "DownstreamPathTemplate": "/routes/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "route-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/routes/{everything}",
-      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete"]
+      "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Auth0",
+        "AllowedScopes": 
+          "read:routes write:routes write:location read:location admin:all"
+      },
+
+      "AddHeadersToRequest": {
+        "X-User-Id": "{claims.user_id}",
+        "X-Company-Id": "{claims.company_id}"
+      }
     },
     {
       "DownstreamPathTemplate": "/tracking/ws",
@@ -49,6 +102,8 @@
       "DownstreamHostAndPorts": [{ "Host": "tracking-service", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/tracking/ws"
     }
-  ]
-  
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://apigateway"
+  }
 }

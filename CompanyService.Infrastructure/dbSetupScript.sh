@@ -8,10 +8,6 @@ DB_PASSWORD="trackPak_dev_password"
 psql -U postgres <<EOF
 -- Create the database
 
-CREATE DATABASE $DB_NAME;
--- Create the user with the specified password
-CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';
-
 -- Grant all privileges on the database to the user
 GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;
 

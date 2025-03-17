@@ -10,7 +10,7 @@ public static class CompanyEndpoints
 {
     public static void MapCompanyEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/companies");
+        var group = app.MapGroup("/company");
 
         group.MapPost("/", CreateCompanyAsync);
         group.MapGet("/{companyId}", GetCompanyByIdAsync);

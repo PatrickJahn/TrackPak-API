@@ -1,4 +1,5 @@
-﻿using Shared.Models;
+﻿using EmployeeService.Domain.Entities;
+using Shared.Models;
 
 namespace CompanyService.Domain.Entities;
 
@@ -9,5 +10,4 @@ public class Company : BaseModel
   public string BrandId { get; set; }
   public string Name { get; set; }
   public Guid? LocationId { get; set; }
-
 }

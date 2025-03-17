@@ -65,12 +65,11 @@ public class UserService: IUserService
        await _userRepo.DeleteByIdAsync(userId);
     }
 
-    public async Task CreateUser(CreateUserModel userModel, CancellationToken cancellationToken)
+    public async Task<Guid> CreateUser(CreateUserModel userModel, CancellationToken cancellationToken)
     {
         
         // TODO: Improve 
         await CheckIfUserExistWithEmail(userModel.Email, cancellationToken);
-        await CheckIfUserExistWithPhone(userModel.PhoneNumber, cancellationToken);
 
         var user = new User
         {
@@ -84,6 +83,8 @@ public class UserService: IUserService
         await _userRepo.AddAsync(user);
          
         await _userEventPublisher.PublishUserCreatedAsync(user, userModel.Location);
+        
+        return user.Id;
     }
 
     private async Task CheckIfUserExistWithEmail(string email, CancellationToken cancellationToken)
