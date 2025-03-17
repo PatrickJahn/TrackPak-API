@@ -1,10 +1,16 @@
 namespace ApiGateway.Services
 {
-    public class OcelotHeaderMiddleware(RequestDelegate next)
+    public class OcelotHeaderMiddleware
     {
+        private readonly RequestDelegate _next;
+
+        public OcelotHeaderMiddleware(RequestDelegate next)
+        {
+            _next = next ?? throw new ArgumentNullException(nameof(next));
+        }
+
         public async Task InvokeAsync(HttpContext context)
         {
-            // Example: Add a custom header to forwarded requests
             if (context.User.Identity.IsAuthenticated)
             {
                 var userId = context.User.Claims.FirstOrDefault(c => c.Type == "user_id")?.Value;
@@ -20,7 +26,7 @@ namespace ApiGateway.Services
                 }
             }
 
-            await next(context); // Pass request to next middleware
+            await _next(context);
         }
     }
 }

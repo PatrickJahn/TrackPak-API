@@ -1,4 +1,5 @@
-﻿using Shared.Models;
+﻿using EmployeeService.Domain.Entities;
+using Shared.Models;
 
 namespace CompanyService.Domain.Entities;
 

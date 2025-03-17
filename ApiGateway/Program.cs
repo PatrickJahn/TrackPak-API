@@ -49,7 +49,6 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddSingleton<IAuthorizationHandler, RoleHandler>();
 
 
-builder.Services.AddTransient<OcelotHeaderMiddleware>(); 
 builder.Services.AddScoped<IUserContextService, UserContextService>(); 
 
 // Add CORS service BEFORE using it
@@ -64,13 +63,11 @@ builder.Services.AddOcelot(builder.Configuration);
 
 var app = builder.Build();
 
-// Enable CORS BEFORE Ocelot Middleware
 app.UseCors("AllowAll");
 
-app.UseMiddleware<OcelotHeaderMiddleware>(); 
+app.UseMiddleware<OcelotHeaderMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseWebSockets();
-app.UseMiddleware<OcelotHeaderMiddleware>(); 
 
 app.UseOcelot().Wait();
 

@@ -26,8 +26,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - OCELOT_CONFIGURATION=ocelot.json # Ocelot config file
     networks:
-        trackpak-network:
-            ipv4_address: 192.168.100.10  # Assigning a static IP
+      - trackpak-network
   
   ngrok:
     image: ngrok/ngrok
