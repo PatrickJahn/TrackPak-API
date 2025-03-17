@@ -1,44 +1,26 @@
-namespace ApiGateway.Services;
-
-public class OcelotHeaderMiddleware(
-    IUserContextService userContextService,
-    ILogger<OcelotHeaderMiddleware> logger)
-    : DelegatingHandler
+namespace ApiGateway.Services
 {
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    public class OcelotHeaderMiddleware(RequestDelegate next)
     {
-        try
+        public async Task InvokeAsync(HttpContext context)
         {
-            var userId = userContextService.GetUserId();
-            string companyId = string.Empty;
+            // Example: Add a custom header to forwarded requests
+            if (context.User.Identity.IsAuthenticated)
+            {
+                var userId = context.User.Claims.FirstOrDefault(c => c.Type == "user_id")?.Value;
+                var companyId = context.User.Claims.FirstOrDefault(c => c.Type == "company_id")?.Value;
 
-            try
-            {
-                companyId = userContextService.GetCompanyId(); 
-            }
-            catch (NullReferenceException ex)
-            {
-                logger.LogWarning("Company ID is missing: {Message}", ex.Message);
-            }
-
-            if (userId != Guid.Empty)
-            {
-                request.Headers.Add("X-User-Id", userId.ToString());
-            }
-
-            if (!string.IsNullOrEmpty(companyId))
-            {
-                request.Headers.Add("X-Company-Id", companyId);
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    context.Request.Headers["X-User-Id"] = userId;
+                }
+                if (!string.IsNullOrEmpty(companyId))
+                {
+                    context.Request.Headers["X-Company-Id"] = companyId;
+                }
             }
 
-            // Log the request headers
-            logger.LogInformation("Added headers: X-User-Id={UserId}, X-Company-Id={CompanyId}", userId, companyId);
+            await next(context); // Pass request to next middleware
         }
-        catch (Exception ex)
-        {
-            logger.LogError("Failed to inject user context headers: {Message}", ex.Message);
-        }
-
-        return await base.SendAsync(request, cancellationToken);
     }
 }

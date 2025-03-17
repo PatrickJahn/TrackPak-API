@@ -1,6 +1,7 @@
 services:
   rabbitmq:
     image: "rabbitmq:3-management"
+    container_name: rabbitmq
     ports:
       - "5672:5672"   # RabbitMQ message broker port
       - "15672:15672" # RabbitMQ management UI
@@ -20,11 +21,13 @@ services:
       - order-service
       - user-service
       - tracking-service
+      - route-service
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - OCELOT_CONFIGURATION=ocelot.json # Ocelot config file
     networks:
-      - trackpak-network
+        trackpak-network:
+            ipv4_address: 192.168.100.10  # Assigning a static IP
   
   ngrok:
     image: ngrok/ngrok
@@ -36,6 +39,7 @@ services:
     networks:
       - trackpak-network
   
+
   company-service:
     image: trackpak-companyservice
     build:
@@ -52,67 +56,71 @@ services:
       - ConnectionStrings__Postgres=Host=company-db;Port=5432;Database=trackpak-companydb;Username=developer;Password=trackPak_dev_password
     networks:
       - trackpak-network
-    
+  
   location-service:
-      image: trackpak-locationservice
-      build:
-        context: .
-        dockerfile: LocationService.Api/Dockerfile
-      depends_on:
-        - rabbitmq
-        - location-db
-      deploy:
-        replicas: 2
-      restart: unless-stopped
-      environment:
-        - ASPNETCORE_ENVIRONMENT=Development
-        - ConnectionStrings__Postgres=Host=location-db;Port=5432;Database=trackpak-locationdb;Username=developer;Password=trackPak_dev_password
-      networks:
-        - trackpak-network
-    
+    image: trackpak-locationservice
+    build:
+      context: .
+      dockerfile: LocationService.Api/Dockerfile
+    depends_on:
+      - rabbitmq
+      - location-db
+    deploy:
+      replicas: 2
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Postgres=Host=location-db;Port=5432;Database=trackpak-locationdb;Username=developer;Password=trackPak_dev_password
+    networks:
+      - trackpak-network
+
   order-service:
-      image: trackpak-orderservice
-      build:
-        context: .
-        dockerfile: OrderService.Api/Dockerfile
-      depends_on:
-        - rabbitmq
-        - order-db
-      deploy:
-        replicas: 2
-      restart: unless-stopped
-      environment:
-        - ASPNETCORE_ENVIRONMENT=Development
-        - ConnectionStrings__Postgres=Host=order-db;Port=5432;Database=trackpak-orderdb;Username=developer;Password=trackPak_dev_password
-      networks:
-        - trackpak-network
-    
+    image: trackpak-orderservice
+    build:
+      context: .
+      dockerfile: OrderService.Api/Dockerfile
+    depends_on:
+      - rabbitmq
+      - order-db
+    deploy:
+      replicas: 2
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Postgres=Host=order-db;Port=5432;Database=trackpak-orderdb;Username=developer;Password=trackPak_dev_password
+    networks:
+      - trackpak-network
+
   user-service:
-      image: trackpak-userservice
-      build:
-        context: .
-        dockerfile: UserService.Api/Dockerfile
-      depends_on:
-        - rabbitmq
-        - user-db
-      deploy:
-        replicas: 2
-      restart: unless-stopped
-      environment:
-        - ASPNETCORE_ENVIRONMENT=Development
-        - ConnectionStrings__Postgres=Host=user-db;Port=5432;Database=trackpak-userdb;Username=developer;Password=trackPak_dev_password
-      networks:
-        - trackpak-network
-      
+    image: trackpak-userservice
+    build:
+      context: .
+      dockerfile: UserService.Api/Dockerfile
+    depends_on:
+      - rabbitmq
+      - user-db
+    deploy:
+      replicas: 2
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Postgres=Host=user-db;Port=5432;Database=trackpak-userdb;Username=developer;Password=trackPak_dev_password
+    networks:
+      - trackpak-network
+
   tracking-service:
     image: trackpak-trackingservice
     build:
       context: .
       dockerfile: TrackingService.Api/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - rabbitmq
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__Postgres=Host=user-db;Port=5432;Database=trackpak-userdb;Username=developer;Password=trackPak_dev_password
+    networks:
+      - trackpak-network
 
   route-service:
     image: trackpak-routeservice
@@ -123,13 +131,16 @@ services:
       - rabbitmq
       - route-db
     deploy:
-      replicas: 2  # Two replicas for x-axis scaling
-      restart_policy:
-        condition: on-failure
+      replicas: 2
+    restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Postgres=Host=user-db;Port=5432;Database=trackpak-routedb;Username=developer;Password=trackPak_dev_password
-
+      - ConnectionStrings__Postgres=Host=route-db;Port=5432;Database=trackpak-routedb;Username=developer;Password=trackPak_dev_password
+    networks:
+      - trackpak-network
+  
+  
+  # ✅ DATABASE SERVICES
   route-db:
     image: postgres:15
     container_name: route-db
@@ -144,7 +155,7 @@ services:
       - route-db-data:/var/lib/postgresql/data
     networks:
       - trackpak-network
-        
+
   company-db:
     image: postgres:15
     container_name: company-db
@@ -159,7 +170,7 @@ services:
       - company-db-data:/var/lib/postgresql/data
     networks:
       - trackpak-network
-      
+
   location-db:
     image: postgres:15
     container_name: location-db
@@ -174,7 +185,7 @@ services:
       - location-db-data:/var/lib/postgresql/data
     networks:
       - trackpak-network
-    
+
   order-db:
     image: postgres:15
     container_name: order-db
@@ -189,7 +200,7 @@ services:
       - order-db-data:/var/lib/postgresql/data
     networks:
       - trackpak-network
-  
+
   user-db:
     image: postgres:15
     container_name: user-db
@@ -209,8 +220,11 @@ services:
 
 networks:
   trackpak-network:
-    driver: bridge 
-    
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24  # Ensure static IP range
+
 volumes:
   company-db-data:
   location-db-data:

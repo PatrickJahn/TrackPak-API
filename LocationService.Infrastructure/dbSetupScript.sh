@@ -5,29 +5,30 @@ DB_NAME="trackpak-locationdb"
 DB_USER="developer"
 DB_PASSWORD="trackPak_dev_password"
 
+echo "⏳ Waiting for PostgreSQL to be ready..."
+until psql -U postgres -c '\q' 2>/dev/null; do
+  sleep 1
+done
+echo "PostgreSQL is ready!"
+
+# Ensure the user exists before assigning roles
 psql -U postgres <<EOF
--- Create the database
-
-CREATE DATABASE $DB_NAME;
--- Create the user with the specified password
-CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';
-
--- Grant all privileges on the database to the user
-GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;
-
--- Allow the user to create new databases (optional)
-ALTER USER $DB_USER CREATEDB;
-
--- Step 2: Grant necessary schema permissions
-GRANT USAGE ON SCHEMA public TO $DB_USER; -- Grants the user the ability to use the schema
-
--- Grant permissions on all tables in the public schema
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $DB_USER;
-
--- Ensure the user can access future tables (for migrations)
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO $DB_USER;
-
-
+SELECT 'CREATE ROLE $DB_USER WITH LOGIN PASSWORD \'$DB_PASSWORD\';'
+WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname='$DB_USER')\gexec
 EOF
 
-echo "Database and user created successfully!"
+# Ensure the database exists before trying to create it (MUST use double quotes for hyphen)
+psql -U postgres <<EOF
+SELECT 'CREATE DATABASE "$DB_NAME" OWNER $DB_USER;'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$DB_NAME')\gexec
+EOF
+
+# Apply permissions inside the new database (MUST use double quotes for hyphen)
+psql -U postgres -d "$DB_NAME" <<EOF
+ALTER USER $DB_USER CREATEDB;
+GRANT USAGE ON SCHEMA public TO $DB_USER;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $DB_USER;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO $DB_USER;
+EOF
+
+echo "Database '$DB_NAME' and user '$DB_USER' configured successfully!"
