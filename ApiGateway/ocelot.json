@@ -1,14 +1,14 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/companies/{everything}",
+      "DownstreamPathTemplate": "/company/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "company-service", "Port": 8080 }],
-      "UpstreamPathTemplate": "/api/companies/{everything}",
+      "UpstreamPathTemplate": "/api/company/{everything}",
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": ["read:companies", "write:companies"]
+        "AllowedScopes": "write:companies read:companies admin:all"
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -23,7 +23,7 @@
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": ["read:location", "write:location"]
+        "AllowedScopes": "write:location read:location admin:all"
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -38,7 +38,7 @@
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": ["read:orders", "write:orders"]
+        "AllowedScopes": "read:orders write:orders admin:all"
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -46,14 +46,18 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/users/{everything}",
+      "DownstreamPathTemplate": "/user/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "user-service", "Port": 8080 }],
-      "UpstreamPathTemplate": "/api/users/{everything}",
+      "UpstreamPathTemplate": "/api/user/{everything}",
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": ["read:users", "write:users"]
+        "AllowedScopes": 
+          "read:users read:users write:users admin:all"
+      },
+      "AddClaimsToRequest": {
+        "Scope": "scope"
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -68,7 +72,7 @@
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": ["read:employees", "write:employees"]
+        "AllowedScopes": "write:employees read:employees admin:all"
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -83,8 +87,10 @@
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": ["read:routes", "write:routes"]
+        "AllowedScopes": 
+          "read:routes write:routes write:location read:location admin:all"
       },
+
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
         "X-Company-Id": "{claims.company_id}"
@@ -98,10 +104,6 @@
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://apigateway",
-    "AuthenticationOptions": {
-      "AuthenticationProviderKey": "Auth0",
-      "AllowedScopes": []
-    }
+    "BaseUrl": "http://apigateway"
   }
 }

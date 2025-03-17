@@ -33,7 +33,9 @@ var auth0Namespace = builder.Configuration["Auth0:Namespace"];
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(PolicyRoles.SystemAdmin, policy =>
-        policy.Requirements.Add(new RoleRequirement(new[] { RoleAsString.SystemAdmin })));
+        policy.RequireAssertion(context =>
+            context.User.HasClaim(c => c.Type == "scope" && c.Value.Contains("admin:all")) || 
+            context.User.HasClaim(c => c.Type == $"{auth0Namespace}/roles" && c.Value == RoleAsString.SystemAdmin)));
 
     options.AddPolicy(PolicyRoles.CompanyAdmin, policy =>
         policy.Requirements.Add(new RoleRequirement(new[] { RoleAsString.SystemAdmin, RoleAsString.CompanyAdmin })));

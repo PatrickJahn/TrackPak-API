@@ -10,7 +10,4 @@ public class Company : BaseModel
   public string BrandId { get; set; }
   public string Name { get; set; }
   public Guid? LocationId { get; set; }
-  public List<Employee>? Employees { get; set; }   
-
-
 }
