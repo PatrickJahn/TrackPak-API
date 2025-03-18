@@ -1,6 +1,7 @@
 ﻿using EmployeeService.Api.Endpoints;
 using EmployeeService.Application;
 using EmployeeService.Infrastructure;
+using Shared.Middelware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
@@ -20,6 +20,7 @@ if (app.Environment.IsDevelopment())
 {
   app.MapOpenApi();
 }
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

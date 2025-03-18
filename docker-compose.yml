@@ -139,6 +139,23 @@ services:
       - trackpak-network
   
   
+  employee-service:
+    image: trackpak-employeeservice
+    build:
+      context: .
+      dockerfile: EmployeeService/EmployeeService.Api/Dockerfile
+    depends_on:
+      - rabbitmq
+      - employee-db
+    deploy:
+      replicas: 2
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Postgres=Host=employee-db;Port=5432;Database=trackpak-employeedb;Username=developer;Password=trackPak_dev_password
+    networks:
+      - trackpak-network
+  
   # ✅ DATABASE SERVICES
   route-db:
     image: postgres:15
@@ -214,6 +231,22 @@ services:
       - user-db-data:/var/lib/postgresql/data
     networks:
       - trackpak-network
+      
+    
+  employee-db:
+    image: postgres:15
+    container_name: employee-db
+    restart: always
+    environment:
+      POSTGRES_USER: developer
+      POSTGRES_PASSWORD: trackPak_dev_password
+      POSTGRES_DB: trackpak-employeedb
+    ports:
+      - "5437:5432"
+    volumes:
+      - employee-db-data:/var/lib/postgresql/data
+    networks:
+      - trackpak-network
         
   
 
@@ -230,3 +263,4 @@ volumes:
   order-db-data:
   user-db-data:
   route-db-data:
+  employee-db-data:
