@@ -1,11 +1,14 @@
+using System.Text.Json;
 using ApiGateway.Security.Roles;
 using ApiGateway.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using Ocelot.Authorization;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Shared.Middelware;
+using Shared.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +19,7 @@ builder.Services.AddAuthentication(o =>
     {
         o.DefaultAuthenticateScheme = "Auth0";
         o.DefaultChallengeScheme = "Auth0"; 
+        
     })
     .AddJwtBearer("Auth0", options =>
     {
@@ -23,6 +27,7 @@ builder.Services.AddAuthentication(o =>
         options.Audience = builder.Configuration["Auth0:Audience"];
         options.RequireHttpsMetadata = false;
 
+        
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
@@ -31,7 +36,11 @@ builder.Services.AddAuthentication(o =>
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
             RoleClaimType = "permissions"
+            
         };
+        
+       
+        
     });
 var auth0Namespace = builder.Configuration["Auth0:Namespace"];
 
@@ -52,7 +61,7 @@ builder.Services.AddAuthorization(options =>
         policy.Requirements.Add(new RoleRequirement(new[] { RoleAsString.Customer })));
 });
 
-
+builder.Services.AddSingleton<IClaimsAuthorizer, CustomPermissionsAuthorizer>();
 builder.Services.AddSingleton<IAuthorizationHandler, RoleHandler>();
 
 
@@ -66,7 +75,7 @@ builder.Services.AddCors(options =>
 });
 
 // Add Ocelot
-builder.Services.AddOcelot(builder.Configuration);
+builder.Services.AddOcelot(builder.Configuration).AddDelegatingHandler<CustomPermissionsAuthorizer>(); // ✅ Ensure Ocelot calls our custom authorizer;
 
 var app = builder.Build();
 
@@ -77,6 +86,24 @@ app.UseAuthorization();
 
 app.UseMiddleware<OcelotHeaderMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.Use(async (context, next) =>
+{
+    var user = context.User;
+    if (user.Identity.IsAuthenticated)
+    {
+        Console.WriteLine("Authenticated User Claims:");
+        foreach (var claim in user.Claims)
+        {
+            Console.WriteLine($"{claim.Type}: {claim.Value}");
+        }
+    }
+    else
+    {
+        Console.WriteLine("User is NOT authenticated.");
+    }
+    await next();
+});
 app.UseWebSockets();
 
 app.UseOcelot().Wait();

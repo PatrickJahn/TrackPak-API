@@ -63,6 +63,7 @@ public class EmployeeService : IEmployeeService
       LastName = employeeModel.LastName,
       PhoneNumber = employeeModel.PhoneNumber,
       Email = employeeModel.Email,
+      CompanyId = employeeModel.CompanyId,
       LocationId = null
     };
     

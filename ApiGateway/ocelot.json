@@ -10,7 +10,7 @@
         "AuthenticationProviderKey": "Auth0"
       },
       "RouteClaimsRequirement": {
-        "permissions": ["write:companies", "read:companies", "admin:all"]
+        "permissions": "write:companies, read:companies, admin:all"
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -27,7 +27,7 @@
         "AuthenticationProviderKey": "Auth0"
       },
       "RouteClaimsRequirement": {
-        "permissions": ["write:location", "read:location", "admin:all"]
+        "permissions": "write:location, read:location, admin:all"
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -44,7 +44,7 @@
         "AuthenticationProviderKey": "Auth0"
       },
       "RouteClaimsRequirement": {
-        "permissions": ["read:orders", "write:orders","admin:all"]
+        "permissions": "read:orders, write:orders, admin:all"
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -61,7 +61,7 @@
         "AuthenticationProviderKey": "Auth0"
       },
       "RouteClaimsRequirement": {
-        "permissions": ["read:users", "write:users", "admin:all"]
+        "permissions": "read:users, write:users, admin:all"
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -69,15 +69,15 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/employees/{everything}",
+      "DownstreamPathTemplate": "/employee/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "employee-service", "Port": 8080 }],
-      "UpstreamPathTemplate": "/api/employees/{everything}",
+      "UpstreamPathTemplate": "/api/employee/{everything}",
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Auth0"},
       "RouteClaimsRequirement": {
-        "permissions": ["write:employees", "read:employees", "admin:all"]
+        "permissions": "read:employees, write:employees, admin:all"
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",

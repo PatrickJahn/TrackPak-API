@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Extensions;
@@ -36,6 +37,7 @@ public static class UserEndpoints
         var user = await service.GetUserByIdAsync(id, cancellationToken);
         return Results.Ok(user);
     }
+    
     
     private static async Task<IResult> GetMeAsync(HttpContext httpContext, IUserService service, CancellationToken cancellationToken)
     {
