@@ -29,7 +29,8 @@ builder.Services.AddAuthentication(o =>
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
+            RoleClaimType = "permissions"
         };
     });
 var auth0Namespace = builder.Configuration["Auth0:Namespace"];

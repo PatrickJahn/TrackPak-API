@@ -7,8 +7,10 @@
       "UpstreamPathTemplate": "/api/company/{everything}",
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": "write:companies read:companies admin:all"
+        "AuthenticationProviderKey": "Auth0"
+      },
+      "RouteClaimsRequirement": {
+        "permissions": ["write:companies", "read:companies", "admin:all"]
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -22,8 +24,10 @@
       "UpstreamPathTemplate": "/api/location/{everything}",
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": "write:location read:location admin:all"
+        "AuthenticationProviderKey": "Auth0"
+      },
+      "RouteClaimsRequirement": {
+        "permissions": ["write:location", "read:location", "admin:all"]
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -37,8 +41,10 @@
       "UpstreamPathTemplate": "/api/orders/{everything}",
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": "read:orders write:orders admin:all"
+        "AuthenticationProviderKey": "Auth0"
+      },
+      "RouteClaimsRequirement": {
+        "permissions": ["read:orders", "write:orders","admin:all"]
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -52,10 +58,10 @@
       "UpstreamPathTemplate": "/api/user/{everything}",
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
-        "AuthenticationProviderKeys": ["Auth0"],
-        "AllowedScopes": [
-    
-        ]
+        "AuthenticationProviderKey": "Auth0"
+      },
+      "RouteClaimsRequirement": {
+        "permissions": ["read:users"]
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -69,8 +75,9 @@
       "UpstreamPathTemplate": "/api/employees/{everything}",
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": "write:employees read:employees admin:all"
+        "AuthenticationProviderKey": "Auth0"},
+      "RouteClaimsRequirement": {
+        "permissions": ["write:employees", "read:employees", "admin:all"]
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
@@ -84,11 +91,11 @@
       "UpstreamPathTemplate": "/api/routes/{everything}",
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": 
-          "read:routes write:routes write:location read:location admin:all"
+        "AuthenticationProviderKey": "Auth0"
       },
-
+      "RouteClaimsRequirement": {
+        "permissions": ["read:routes", "write:routes", "write:location", "read:location", "admin:all"]
+      },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
         "X-Company-Id": "{claims.company_id}"
