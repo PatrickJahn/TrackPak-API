@@ -61,7 +61,7 @@
         "AuthenticationProviderKey": "Auth0"
       },
       "RouteClaimsRequirement": {
-        "permissions": ["read:users"]
+        "permissions": ["read:users", "write:users", "admin:all"]
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
