@@ -12,7 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Load Ocelot configuration
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 // Add authentication with Auth0
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(o =>
+    {
+        o.DefaultAuthenticateScheme = "Auth0";
+        o.DefaultChallengeScheme = "Auth0"; 
+    })
     .AddJwtBearer("Auth0", options =>
     {
         options.Authority = builder.Configuration["Auth0:Authority"];
@@ -66,6 +70,9 @@ builder.Services.AddOcelot(builder.Configuration);
 var app = builder.Build();
 
 app.UseCors("AllowAll");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseMiddleware<OcelotHeaderMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();

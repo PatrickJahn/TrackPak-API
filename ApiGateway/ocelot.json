@@ -52,12 +52,10 @@
       "UpstreamPathTemplate": "/api/user/{everything}",
       "UpstreamHttpMethod": ["Get", "Post", "Put", "Delete", "Options"],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Auth0",
-        "AllowedScopes": 
-          "read:users read:users write:users admin:all"
-      },
-      "AddClaimsToRequest": {
-        "Scope": "scope"
+        "AuthenticationProviderKeys": ["Auth0"],
+        "AllowedScopes": [
+    
+        ]
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",

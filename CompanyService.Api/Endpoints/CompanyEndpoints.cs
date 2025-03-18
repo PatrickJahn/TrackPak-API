@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using CompanyService.Application.Interfaces;
 using CompanyService.Application.Models;
 using CompanyService.Domain.Entities;
+using Shared.Extensions;
 
 
 namespace CompanyService.Api.Endpoints;
@@ -14,6 +15,8 @@ public static class CompanyEndpoints
 
         group.MapPost("/", CreateCompanyAsync);
         group.MapGet("/{companyId}", GetCompanyByIdAsync);
+        group.MapGet("/me", GetMeAsync);
+
         group.MapGet("/", GetCompaniesAsync);
         group.MapPut("/{companyId}", UpdateCompanyAsync);
         group.MapDelete("/{companyId}", DeleteCompanyAsync);
@@ -27,7 +30,16 @@ public static class CompanyEndpoints
         var createdCompany = await companyService.CreateCompanyAsync(company, cancellationToken);
         return Results.Ok(createdCompany);
     }
-
+    private static async Task<IResult> GetMeAsync(HttpContext httpContext, ICompanyService service, CancellationToken cancellationToken)
+    {
+        var companyId = httpContext.GetCompanyId();
+        
+        if (companyId is null)
+            return Results.Unauthorized();
+        
+        var company = await service.GetCompanyByIdAsync((Guid) companyId, cancellationToken);
+        return Results.Ok(company);
+    }
     private static async Task<Results<Ok<Company>, NotFound>> GetCompanyByIdAsync(
         Guid companyId,
         ICompanyService companyService,

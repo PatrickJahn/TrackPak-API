@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using EmployeeService.Api.Dtos;
 using EmployeeService.Application.Interfaces;
 using EmployeeService.Application.Models;
+using Shared.Extensions;
 
 namespace EmployeeService.Api.Endpoints;
 
@@ -12,6 +13,18 @@ public static class EmployeeEndpoints
     app.MapGet("employee/{id}", async (Guid id, IEmployeeService service) =>
     {
       var employee = await service.GetEmployeeByIdAsync(id);
+      return Results.Ok(employee);
+    });
+    
+    app.MapGet("employee/me", async (HttpContext httpContext, IEmployeeService service) =>
+    {
+
+      var userId = httpContext.GetUserId();
+      
+      if(userId == null)
+        return Results.Unauthorized();
+      
+      var employee = await service.GetEmployeeByIdAsync((Guid) userId);
       return Results.Ok(employee);
     });
     

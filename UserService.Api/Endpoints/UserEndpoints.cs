@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Extensions;
 using Shared.Models;
 using UserService.Api.Dtos;
 using UserService.Application.Interfaces;
@@ -9,12 +10,15 @@ namespace UserService.Api.Endpoints;
 
 public static class UserEndpoints
 {
+
     public static void MapUserEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/user");
         
         group.MapPost("/", CreateUserAsync);
         group.MapGet("/{id}", GetUserByIdAsync);
+        group.MapGet("/me", GetMeAsync);
+
         group.MapPut("/{id}", UpdateUserAsync);
         group.MapDelete("/{id}", UpdateUserAsync);
         group.MapPut("/{id}", UpdateUserAsync);
@@ -33,6 +37,17 @@ public static class UserEndpoints
         return Results.Ok(user);
     }
     
+    private static async Task<IResult> GetMeAsync(HttpContext httpContext, IUserService service, CancellationToken cancellationToken)
+    {
+
+        var userId = httpContext.GetUserId();
+        
+        if (userId is null)
+            return Results.NotFound("User not found");
+
+        var user = await service.GetUserByIdAsync((Guid) userId, cancellationToken);
+        return Results.Ok(user);
+    }
     private static async Task<IResult> UpdateUserAsync(Guid id, [FromBody] UpdateUserModel userModel,IUserService service, CancellationToken cancellationToken)
     {
         var updatedUser = await service.UpdateUserAsync(id, userModel, cancellationToken);
