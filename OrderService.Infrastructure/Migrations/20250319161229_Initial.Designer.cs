@@ -12,7 +12,7 @@ using OrderService.Infrastructure.DBContext;
 namespace OrderService.Infrastructure.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20250129214228_Initial")]
+    [Migration("20250319161229_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -62,9 +62,8 @@ namespace OrderService.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
