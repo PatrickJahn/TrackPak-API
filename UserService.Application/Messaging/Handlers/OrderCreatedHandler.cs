@@ -30,7 +30,7 @@ public class OrderCreatedHandler(IUserService userService, IUserEventPublisher u
         
         var userId =  await userService.CreateUser(user, cancellationToken);
         
-        // TODO: Publish OrderUserCreatedEvent
+        await userEventPublisher.PublishOrderUserCreatedAsync(userId, message.OrderId);
         
     }
 }

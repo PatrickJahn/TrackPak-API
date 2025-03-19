@@ -35,4 +35,17 @@ public class UserEventPublisher(IMessageBus messageBus) : IUserEventPublisher
         };
         await messageBus.PublishAsync(MessageTopic.UserLocationUpdated, userLocationUpdatedEvent);
     }
+
+    public async Task PublishOrderUserCreatedAsync(Guid userId, Guid orderId)
+    {
+        
+        var orderUserCreatedEvent = new OrderUserCreatedEvent()
+        {
+            UserId = userId, 
+            OrderId = orderId
+        };
+        
+        await messageBus.PublishAsync(MessageTopic.OrderUserCreated, orderUserCreatedEvent);
+
+    }
 }

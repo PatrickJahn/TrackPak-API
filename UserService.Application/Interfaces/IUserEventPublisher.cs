@@ -7,5 +7,7 @@ public interface IUserEventPublisher
 {
     Task PublishUserCreatedAsync(User user, CreateLocationRequestModel location);
     Task PublishUserLocationUpdatedAsync(Guid userId, CreateLocationRequestModel user);
+    
+    Task PublishOrderUserCreatedAsync(Guid userId, Guid orderId);
 
 }
