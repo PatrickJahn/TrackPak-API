@@ -22,6 +22,11 @@ public class EmployeeService : IEmployeeService
     return await _employeeRepo.GetByIdAsync(employeeId);
   }
 
+  public async Task<Employee?> GetEmployeeByEmailAsync(string email)
+  {
+    return await _employeeRepo.GetAllAsync(emp => emp.Email == email).ContinueWith(emp => emp.Result.FirstOrDefault());
+  }
+
   public async Task<IEnumerable<Employee>> GetEmployeeByCompanyIdAsync(Guid companyId)
   {
     return await _employeeRepo.GetAllAsync(employee => employee.CompanyId == companyId);

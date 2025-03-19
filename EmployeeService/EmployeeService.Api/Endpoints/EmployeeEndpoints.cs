@@ -16,6 +16,7 @@ public static class EmployeeEndpoints
         group.MapGet("/me", GetMyEmployeeProfileAsync);
         group.MapGet("/by-company/{companyId}", GetEmployeesByCompanyIdAsync);
         group.MapGet("/", GetEmployeesAsync);
+        group.MapGet("/by-email/{email}", GetEmployeeByEmailAsync);
 
         group.MapPost("/", CreateEmployeeAsync);
         group.MapPut("/{id}", UpdateEmployeeAsync);
@@ -27,6 +28,13 @@ public static class EmployeeEndpoints
         var employee = await service.GetEmployeeByIdAsync(id);
         return Results.Ok(employee);
     }
+    
+    private static async Task<IResult> GetEmployeeByEmailAsync(string email, IEmployeeService service)
+    {
+        var employee = await service.GetEmployeeByEmailAsync(email);
+        return Results.Ok(employee);
+    }
+
 
     private static async Task<IResult> GetMyEmployeeProfileAsync(HttpContext httpContext, IEmployeeService service)
     {

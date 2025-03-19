@@ -15,7 +15,7 @@ namespace OrderService.Domain.Entities
         public Guid LocationId { get; set; }
 
         public OrderStatus Status { get; set; }
-        public string Type { get; set; }
+        public OrderType Type { get; set; }
         public string Description { get; set; }
 
         public ICollection<OrderItem> OrderItems { get; set; }

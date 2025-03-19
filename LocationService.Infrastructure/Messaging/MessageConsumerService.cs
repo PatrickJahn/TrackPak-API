@@ -22,6 +22,7 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
                 var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<UserCreatedEvent>>();
                 await handler.HandleAsync(message, stoppingToken);
             });
+        
 
         await messageBus.SubscribeAsync<OrderCreatedEvent>(
             MessageTopic.OrderCreated, async (message) =>

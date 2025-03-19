@@ -1,4 +1,5 @@
 using OrderService.Application.Interfaces;
+using OrderService.Application.Models;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Enums;
 using OrderService.Domain.Interfaces;
@@ -6,19 +7,25 @@ using OrderService.Domain.Interfaces;
 
 namespace OrderService.Application.Services
 {
-    public class OrderService(IOrderRepository orderRepository) : IOrderService
+    public class OrderService(IOrderRepository orderRepository, IOrderEventPublisher eventPublisher) : IOrderService
     {
-        public async Task<Order> CreateOrderAsync(Order order, CancellationToken cancellationToken = default)
+        public async Task<Order> CreateOrderAsync(CreateOrderModel order, CancellationToken cancellationToken = default)
         {
-            order.Id = Guid.NewGuid();
-            order.Status = OrderStatus.Pending;
-            order.CreatedAt = DateTime.UtcNow;
+     
+            var newOrder = new Order()
+            {
+                Type = order.Type,
+                CompanyId = order.CompanyId,
+                Description = order.Description,
+                OrderItems = order.OrderItems,
+            };
 
-            await orderRepository.AddAsync(order);
+            await orderRepository.AddAsync(newOrder);
 
             // Publish OrderCreatedEvent via messaging
+            await eventPublisher.PublishOrderCreatedAsync(newOrder, order.Location, order.User);
 
-            return order;
+            return newOrder;
         }
 
         public async Task<Order?> GetOrderByIdAsync(Guid orderId, CancellationToken cancellationToken = default)

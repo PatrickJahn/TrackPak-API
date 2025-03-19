@@ -28,7 +28,8 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
 
             try
             {
-                Console.WriteLine($"OrderCreatedEvent received: OrderId: {message.OrderId}, CustomerId: {message.UserId}");
+                // TODO: Fix
+                Console.WriteLine($"OrderCreatedEvent received: OrderId: {message.OrderId}, CustomerId: {message}");
                 await handler.HandleAsync(message, stoppingToken);
             }
             catch (Exception ex)
