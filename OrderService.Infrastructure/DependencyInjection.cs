@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OrderService.Application.Interfaces;
 using OrderService.Domain.Interfaces;
 using OrderService.Infrastructure.DBContext;
 using OrderService.Infrastructure.Messaging;
@@ -19,7 +20,6 @@ public static class DependencyInjection
         services.AddDbContext<OrderDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Postgres")));
 
-        services.AddScoped<IOrderRepository, OrderRepository>();
 
            
         // ServiceBus config (RabbitMq)
@@ -33,6 +33,13 @@ public static class DependencyInjection
             services.AddSingleton<IMessageBus, RabbitMqServiceBus>();
         }
         services.AddHostedService<MessageConsumerService>(); // Background listening service:))
+        
+        
+        // Event Message publishers
+        services.AddScoped<IOrderEventPublisher, OrderEventPublisher>();
+        
+        // Repositories
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         // Ensure migrations are applied
         // Ensure migrations are applied in non-production environments
