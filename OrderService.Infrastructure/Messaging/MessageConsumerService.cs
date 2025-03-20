@@ -1,12 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
 using Shared.Messaging;
 using Shared.Messaging.Events.Location;
-using Shared.Messaging.Events.Order;
+using Shared.Messaging.Events.User;
 using Shared.Messaging.Topics;
 
-namespace UserService.Infrastructure.Messaging;
+namespace OrderService.Infrastructure.Messaging;
 
 public class MessageConsumerService(IMessageBus messageBus, IServiceProvider serviceProvider) 
     : BackgroundService
@@ -14,37 +13,34 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+      
+        await messageBus.SubscribeAsync<OrderLocationCreatedEvent>(MessageTopic.OrderLocationCreated, OrderLocationCreatedHandler);
         
-        await messageBus.SubscribeAsync<OrderCreatedEvent>(
-            MessageTopic.OrderCreated, async (message) =>
+        await messageBus.SubscribeAsync<OrderUserCreatedEvent>(
+            MessageTopic.OrderUserCreated, async (message) =>
             {
                 using var scope = serviceProvider.CreateScope();
-                var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<OrderCreatedEvent>>();
+                var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<OrderUserCreatedEvent>>();
                 await handler.HandleAsync(message, stoppingToken);
             });
 
         
         
-        await messageBus.SubscribeAsync<UserLocationCreatedEvent>(MessageTopic.UserLocationCreated, async message =>
+        async void OrderLocationCreatedHandler(OrderLocationCreatedEvent message)
         {
             using var scope = serviceProvider.CreateScope();
-            var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<UserLocationCreatedEvent>>();
+            var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<OrderLocationCreatedEvent>>();
 
             try
             {
-                Console.WriteLine($"UserLocationCreatedEvent received: LocationId: {message.LocationId}, UserId: {message.UserId}");
+                Console.WriteLine($"OrderLocationCreatedEvent received: LocationId: {message.LocationId}, OrderId: {message.OrderId}");
                 await handler.HandleAsync(message, stoppingToken);
-                
-                
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error handling message: {ex.Message}");
             }
-            
-        });
-        
-        await Task.Delay(Timeout.Infinite, stoppingToken);
+        }
 
     }
 }

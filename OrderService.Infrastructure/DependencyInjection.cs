@@ -1,10 +1,14 @@
+using EasyNetQ;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OrderService.Application.Interfaces;
 using OrderService.Domain.Interfaces;
 using OrderService.Infrastructure.DBContext;
+using OrderService.Infrastructure.Messaging;
 using OrderService.Infrastructure.Repositories;
+using Shared.Messaging;
 
 namespace OrderService.Infrastructure;
 
@@ -16,6 +20,25 @@ public static class DependencyInjection
         services.AddDbContext<OrderDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Postgres")));
 
+
+           
+        // ServiceBus config (RabbitMq)
+        if (configuration.GetSection("ServiceBus").GetValue<bool>("useMock"))
+        {
+            services.AddSingleton<IMessageBus, MockRabbitMqServiceBus>();
+        }
+        else
+        {
+            services.AddEasyNetQ(configuration.GetConnectionString("RabbitMQ") ?? throw new InvalidOperationException());
+            services.AddSingleton<IMessageBus, RabbitMqServiceBus>();
+        }
+        services.AddHostedService<MessageConsumerService>(); // Background listening service:))
+        
+        
+        // Event Message publishers
+        services.AddScoped<IOrderEventPublisher, OrderEventPublisher>();
+        
+        // Repositories
         services.AddScoped<IOrderRepository, OrderRepository>();
 
         // Ensure migrations are applied

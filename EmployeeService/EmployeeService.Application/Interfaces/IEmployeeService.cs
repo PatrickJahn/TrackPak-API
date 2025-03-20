@@ -8,6 +8,7 @@ namespace EmployeeService.Application.Interfaces;
 public interface IEmployeeService
 {
   public Task<Employee> GetEmployeeByIdAsync(Guid employeeId);
+  public Task<Employee?> GetEmployeeByEmailAsync(string Email);
     
   public Task<IEnumerable<Employee>> GetEmployeeByCompanyIdAsync(Guid companyId);
 

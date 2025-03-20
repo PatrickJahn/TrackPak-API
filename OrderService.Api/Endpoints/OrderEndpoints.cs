@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using OrderService.Application.Interfaces;
+using OrderService.Application.Models;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Enums;
 
@@ -21,11 +22,10 @@ public static class OrderEndpoints
     }
 
     private static async Task<Results<Created<Order>, BadRequest<string>>> CreateOrderAsync(
-        Order order,
+        CreateOrderModel order,
         IOrderService orderService,
         CancellationToken cancellationToken)
     {
-        // TODO: Create order dto for request
         var createdOrder = await orderService.CreateOrderAsync(order, cancellationToken);
         return createdOrder != null ? TypedResults.Created($"/orders/{createdOrder.Id}", createdOrder) 
                                     : TypedResults.BadRequest("Failed to create order.");

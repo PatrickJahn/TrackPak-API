@@ -6,6 +6,7 @@ public enum MessageTopic
     // User events
     UserCreated = 10,
     UserLocationUpdated = 12,
+    OrderUserCreated = 13,
 
 
     

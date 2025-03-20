@@ -38,7 +38,6 @@ public static class DependencyInjection
 
         // Event Message publishers
         services.AddScoped<IUserEventPublisher, UserEventPublisher>();
-
         
         
         // Repositories

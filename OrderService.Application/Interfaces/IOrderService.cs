@@ -1,10 +1,11 @@
+using OrderService.Application.Models;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Enums;
 namespace OrderService.Application.Interfaces
 {
     public interface IOrderService
     {
-        Task<Order> CreateOrderAsync(Order order, CancellationToken cancellationToken = default);
+        Task<Order> CreateOrderAsync(CreateOrderModel order, CancellationToken cancellationToken = default);
         Task<Order?> GetOrderByIdAsync(Guid orderId, CancellationToken cancellationToken = default);
         Task<IEnumerable<Order>> GetOrdersAsync(
             Guid? userId, 

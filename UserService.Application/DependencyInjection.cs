@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Messaging;
 using Shared.Messaging.Events.Location;
+using Shared.Messaging.Events.Order;
 using UserService.Application.Interfaces;
 using UserService.Application.Messaging;
 using UserService.Application.Messaging.Handlers;
@@ -15,6 +16,8 @@ public static class DependencyInjection
         
         // MessageHandlers
         services.AddScoped<IMessageHandler<UserLocationCreatedEvent>, UserLocationCreatedHandler>();
+        services.AddScoped<IMessageHandler<OrderCreatedEvent>, OrderCreatedHandler>();
+        
         
     }
     
