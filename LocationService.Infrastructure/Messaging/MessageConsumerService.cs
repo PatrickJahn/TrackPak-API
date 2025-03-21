@@ -16,7 +16,7 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await messageBus.SubscribeAsync<UserCreatedEvent>(
-            MessageTopic.UserCreated, async (message) =>
+            MessageTopic.UserCreated,  "LocationService",async (message) =>
             {
                 using var scope = serviceProvider.CreateScope();
                 var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<UserCreatedEvent>>();
@@ -25,7 +25,7 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
         
 
         await messageBus.SubscribeAsync<OrderCreatedEvent>(
-            MessageTopic.OrderCreated, async (message) =>
+            MessageTopic.OrderCreated, "LocationService", async (message) =>
             {
                 using var scope = serviceProvider.CreateScope();
                 var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<OrderCreatedEvent>>();
@@ -33,7 +33,7 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
             });
 
         await messageBus.SubscribeAsync<EmployeeCreatedEvent>(
-            MessageTopic.EmployeeCreated, async (message) =>
+            MessageTopic.EmployeeCreated,  "LocationService", async (message) =>
             {
                 using var scope = serviceProvider.CreateScope();
                 var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<EmployeeCreatedEvent>>();
@@ -41,7 +41,7 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
             });
 
         await messageBus.SubscribeAsync<CompanyCreatedEvent>(
-            MessageTopic.CompanyCreated, async (message) =>
+            MessageTopic.CompanyCreated, "LocationService", async (message) =>
             {
                 using var scope = serviceProvider.CreateScope();
                 var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<CompanyCreatedEvent>>();
@@ -49,7 +49,7 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
             });
         
         await messageBus.SubscribeAsync<UserLocationUpdatedEvent>(
-            MessageTopic.UserLocationUpdated, async (message) =>
+            MessageTopic.UserLocationUpdated, "LocationService", async (message) =>
             {
                 using var scope = serviceProvider.CreateScope();
                 var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<UserLocationUpdatedEvent>>();

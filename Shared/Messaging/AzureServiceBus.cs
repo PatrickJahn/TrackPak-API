@@ -17,6 +17,11 @@ public class AzureServiceBus(string connectionString) : IMessageBus
         var serviceBusMessage = new ServiceBusMessage(message?.ToString());
         await sender.SendMessageAsync(serviceBusMessage);    }
 
+    public Task SubscribeAsync<T>(MessageTopic topic, string subscriberId, Action<T> handler)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task SubscribeAsync<T>(MessageTopic topic, Action<T> handler)
     {
         // TODO: Check up on subscriptionName 

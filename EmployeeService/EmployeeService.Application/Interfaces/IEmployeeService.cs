@@ -9,6 +9,10 @@ public interface IEmployeeService
 {
   public Task<Employee> GetEmployeeByIdAsync(Guid employeeId);
   public Task<Employee?> GetEmployeeByEmailAsync(string Email);
+  
+  public Task CheckIn(Guid employeeId);
+  public Task CheckOut(Guid employeeId);
+
     
   public Task<IEnumerable<Employee>> GetEmployeeByCompanyIdAsync(Guid companyId);
 

@@ -1,5 +1,6 @@
 
 
+using System.Text.Json.Serialization;
 using OrderService.Api.Endpoints;
 using OrderService.Application;
 using OrderService.Application.Interfaces;
@@ -14,6 +15,11 @@ builder.Services.AddOpenApi();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
 builder.Services.Configure<GatewaySettings>(options =>
     options.AllowedGateways = builder.Configuration.GetSection("AllowedGateways").Get<string[]>() ?? Array.Empty<string>());
 
@@ -24,7 +30,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-app.UseMiddleware<GatewayRestrictionMiddleware>();
+//app.UseMiddleware<GatewayRestrictionMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();

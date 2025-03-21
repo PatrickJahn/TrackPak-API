@@ -47,6 +47,7 @@ public static class OrderEndpoints
         IOrderService orderService,
         CancellationToken cancellationToken)
     {
+        
         var orders = await orderService.GetOrdersAsync(userId, companyId, status, cancellationToken);
         return TypedResults.Ok(orders);
     }

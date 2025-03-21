@@ -27,6 +27,22 @@ public class EmployeeService : IEmployeeService
     return await _employeeRepo.GetAllAsync(emp => emp.Email == email).ContinueWith(emp => emp.Result.FirstOrDefault());
   }
 
+  public async Task CheckIn(Guid employeeId)
+  {
+    var employee = await _employeeRepo.GetByIdAsync(employeeId);
+    employee.CheckedIn = true;
+    await _employeeRepo.Update(employee);
+
+  }
+  
+  public async Task CheckOut(Guid employeeId)
+  {
+    var employee = await _employeeRepo.GetByIdAsync(employeeId);
+    employee.CheckedIn = false;
+    await _employeeRepo.Update(employee);
+
+  }
+
   public async Task<IEnumerable<Employee>> GetEmployeeByCompanyIdAsync(Guid companyId)
   {
     return await _employeeRepo.GetAllAsync(employee => employee.CompanyId == companyId);

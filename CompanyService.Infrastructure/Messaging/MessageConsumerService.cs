@@ -12,7 +12,7 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
       
-        await messageBus.SubscribeAsync<CompanyLocationCreatedEvent>(MessageTopic.CompanyLocationCreated, CompanyLocationCreatedHandler);
+        await messageBus.SubscribeAsync<CompanyLocationCreatedEvent>(MessageTopic.CompanyLocationCreated, "CompanyService", CompanyLocationCreatedHandler);
         
         
         async void CompanyLocationCreatedHandler(CompanyLocationCreatedEvent message)

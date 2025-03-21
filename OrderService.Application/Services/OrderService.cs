@@ -17,7 +17,12 @@ namespace OrderService.Application.Services
                 Type = order.Type,
                 CompanyId = order.CompanyId,
                 Description = order.Description,
-                OrderItems = order.OrderItems,
+                OrderItems = order.OrderItems.Select(x => new OrderItem()
+                {
+                    Title = x.Title,
+                    Price = x.Price,
+                    Quantity = x.Quantity,
+                }).ToList(),
             };
 
             await orderRepository.AddAsync(newOrder);

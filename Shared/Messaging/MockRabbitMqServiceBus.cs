@@ -10,7 +10,7 @@ public class MockRabbitMqServiceBus: IMessageBus
         Console.WriteLine($"Publishing message to topic {Enum.GetName(topic)}");
     }
 
-    public async Task SubscribeAsync<T>(MessageTopic topic, Action<T> handler)
+    public async Task SubscribeAsync<T>(MessageTopic topic, string subscriptionId, Action<T> handler)
     {
        Console.WriteLine($"Subscribing to topic {Enum.GetName(topic)}");
     }
