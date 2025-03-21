@@ -27,8 +27,7 @@ public class WebSocketManager
         if (!Guid.TryParse(employeeId, out var empGuid))
         {
             context.Response.StatusCode = 400;
-            await context.Response.WriteAsync("Invalid employeeId");
-            return;
+            throw new Exception($"Invalid employee id: {employeeId}");
         }
         
         // Users can only connect if the employee is already online
@@ -37,15 +36,13 @@ public class WebSocketManager
             if (!Guid.TryParse(userId, out var userGuid))
             {
                 context.Response.StatusCode = 400;
-                await context.Response.WriteAsync("Invalid userId");
-                return;
+                throw new Exception($"Invalid user id: {userId}");
             }
 
             if (!_employees.ContainsKey(empGuid)) // Employee must be online first
             {
                 context.Response.StatusCode = 404;
-                await context.Response.WriteAsync("Employee is not connected");
-                return;
+                throw new Exception($"Employee is not connected");
             }
         }
     
