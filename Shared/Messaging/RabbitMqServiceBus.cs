@@ -15,14 +15,15 @@ public class RabbitMqServiceBus(IBus bus) : IMessageBus
        await _bus.PubSub.PublishAsync(message, Enum.GetName(topic));
     }
 
-    public async Task SubscribeAsync<T>(MessageTopic topic, Action<T> handler)
+    public async Task SubscribeAsync<T>(MessageTopic topic, string subscriberId, Action<T> handler)
     {
-        Console.WriteLine("Subscription to RabbitMQ, Topic: " + Enum.GetName(topic));
+        var subscriptionId = $"{Enum.GetName(topic)}-{subscriberId}";
+        Console.WriteLine("Subscription to RabbitMQ, Topic: " + subscriptionId);
 
-       await _bus.PubSub.SubscribeAsync<T>(Enum.GetName(topic)!,  async message =>
-       {
-           Console.WriteLine("Received message: " + Enum.GetName(topic));
-           handler(message);
-       });
+        await _bus.PubSub.SubscribeAsync<T>(subscriptionId, async message =>
+        {
+            Console.WriteLine("Received message: " + subscriptionId);
+            handler(message);
+        });
     }
 }

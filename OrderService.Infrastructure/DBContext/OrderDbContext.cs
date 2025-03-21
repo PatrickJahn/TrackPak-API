@@ -13,8 +13,8 @@ public class OrderDbContext(DbContextOptions<OrderDbContext> options) : Microsof
         modelBuilder.Entity<Order>()
             .HasMany(e => e.OrderItems)
             .WithOne(e => e.Order)
-            .HasForeignKey(e => e.Id)
-            .HasPrincipalKey(e => e.Id);
+            .OnDelete(DeleteBehavior.Cascade);
+        
     }
    
 }

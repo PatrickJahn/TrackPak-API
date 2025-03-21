@@ -69,17 +69,17 @@ public class UserServiceIntegrationTests : IClassFixture<RabbitMqTestContainer>
 
         // Subscribe handlers to RabbitMQ events
         _rabbitMqServiceBus.SubscribeAsync<UserCreatedEvent>(
-            MessageTopic.UserCreated,
+            MessageTopic.UserCreated,"test",
             async evt => await _userCreatedHandler.HandleAsync(evt, CancellationToken.None)
         );
 
         _rabbitMqServiceBus.SubscribeAsync<UserLocationCreatedEvent>(
-            MessageTopic.UserLocationCreated,
+            MessageTopic.UserLocationCreated, "test",
             async evt => await _userLocationCreatedHandler.HandleAsync(evt, CancellationToken.None)
         );
         
         _rabbitMqServiceBus.SubscribeAsync<UserLocationUpdatedEvent>(
-            MessageTopic.UserLocationCreated,
+            MessageTopic.UserLocationCreated,"test",
             async evt => await _userLocationUpdatedHandler.HandleAsync(evt, CancellationToken.None)
         );
         

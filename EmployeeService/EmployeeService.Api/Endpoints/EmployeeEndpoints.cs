@@ -21,6 +21,11 @@ public static class EmployeeEndpoints
         group.MapPost("/", CreateEmployeeAsync);
         group.MapPut("/{id}", UpdateEmployeeAsync);
         group.MapDelete("/{id}", DeleteEmployeeAsync);
+        
+        group.MapPost("/{id}/check-in", CheckIn);
+        group.MapPost("/{id}/check-out", CheckOut);
+
+
     }
 
     private static async Task<IResult> GetEmployeeByIdAsync(Guid id, IEmployeeService service)
@@ -34,6 +39,20 @@ public static class EmployeeEndpoints
         var employee = await service.GetEmployeeByEmailAsync(email);
         return Results.Ok(employee);
     }
+    
+    private static async Task<IResult> CheckIn(Guid id, IEmployeeService service)
+    {
+         await service.CheckIn(id);
+        return Results.Ok();
+    }
+    
+    private static async Task<IResult> CheckOut(Guid id, IEmployeeService service)
+    {
+        await service.CheckOut(id);
+        return Results.Ok();
+    }
+
+
 
 
     private static async Task<IResult> GetMyEmployeeProfileAsync(HttpContext httpContext, IEmployeeService service)

@@ -14,10 +14,10 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         // Subscribe to Route-related events
-        await messageBus.SubscribeAsync<OrderCreatedEvent>(MessageTopic.OrderCreated, OrderCreatedHandler);
-        await messageBus.SubscribeAsync<OrderCancelledEvent>(MessageTopic.OrderCancelled, OrderCancelledHandler);
-        await messageBus.SubscribeAsync<EmployeeCreatedEvent>(MessageTopic.EmployeeCreated, EmployeeCreatedHandler);
-        await messageBus.SubscribeAsync<CompanyLocationCreatedEvent>(MessageTopic.CompanyLocationCreated, CompanyLocationCreatedHandler);
+        await messageBus.SubscribeAsync<OrderCreatedEvent>(MessageTopic.OrderCreated, "RouteService", OrderCreatedHandler);
+        await messageBus.SubscribeAsync<OrderCancelledEvent>(MessageTopic.OrderCancelled,"RouteService", OrderCancelledHandler);
+        await messageBus.SubscribeAsync<EmployeeCreatedEvent>(MessageTopic.EmployeeCreated,"RouteService", EmployeeCreatedHandler);
+        await messageBus.SubscribeAsync<CompanyLocationCreatedEvent>(MessageTopic.CompanyLocationCreated,"RouteService", CompanyLocationCreatedHandler);
 
         // Event Handlers
 

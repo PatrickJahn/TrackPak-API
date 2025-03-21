@@ -16,7 +16,7 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
     {
         
         await messageBus.SubscribeAsync<OrderCreatedEvent>(
-            MessageTopic.OrderCreated, async (message) =>
+            MessageTopic.OrderCreated, "UserService", async (message) =>
             {
                 using var scope = serviceProvider.CreateScope();
                 var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<OrderCreatedEvent>>();
@@ -25,7 +25,7 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
 
         
         
-        await messageBus.SubscribeAsync<UserLocationCreatedEvent>(MessageTopic.UserLocationCreated, async message =>
+        await messageBus.SubscribeAsync<UserLocationCreatedEvent>(MessageTopic.UserLocationCreated, "UserService", async message =>
         {
             using var scope = serviceProvider.CreateScope();
             var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<UserLocationCreatedEvent>>();

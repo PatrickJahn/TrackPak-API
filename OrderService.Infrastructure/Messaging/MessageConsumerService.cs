@@ -14,10 +14,10 @@ public class MessageConsumerService(IMessageBus messageBus, IServiceProvider ser
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
       
-        await messageBus.SubscribeAsync<OrderLocationCreatedEvent>(MessageTopic.OrderLocationCreated, OrderLocationCreatedHandler);
+        await messageBus.SubscribeAsync<OrderLocationCreatedEvent>(MessageTopic.OrderLocationCreated,  "OrderService",  OrderLocationCreatedHandler);
         
         await messageBus.SubscribeAsync<OrderUserCreatedEvent>(
-            MessageTopic.OrderUserCreated, async (message) =>
+            MessageTopic.OrderUserCreated,  "OrderService", async (message) =>
             {
                 using var scope = serviceProvider.CreateScope();
                 var handler = scope.ServiceProvider.GetRequiredService<IMessageHandler<OrderUserCreatedEvent>>();
