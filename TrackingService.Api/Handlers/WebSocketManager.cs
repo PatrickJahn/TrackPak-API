@@ -30,11 +30,17 @@ public class WebSocketManager
 
             if (!string.IsNullOrEmpty(userId))
             {
-                if (!Guid.TryParse(userId, out _))
+                if (!Guid.TryParse(userId, out var userGuid))
+                {
+                    context.Response.StatusCode = 400;
                     throw new Exception($"Invalid user id: {userId}");
+                }
 
-                if (!_employees.ContainsKey(empGuid))
-                    throw new Exception("Employee is not connected");
+                if (!_employees.ContainsKey(empGuid)) // Employee must be online first
+                {
+                    context.Response.StatusCode = 404;
+                    throw new Exception($"Employee is not connected");
+                }
             }
 
             using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
