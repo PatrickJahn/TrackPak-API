@@ -25,4 +25,10 @@ public interface IRouteEventPublisher
     /// Publishes an event when a route is delayed due to traffic or other factors.
     /// </summary>
     Task PublishRouteDelayedAsync(Guid routeId, TimeSpan delayDuration, string reason);
+    
+    /// <summary>
+    /// Publishes a message requesting company orders from the Order Service.
+    /// </summary>
+    Task PublishFetchCompanyOrdersAsync(Guid companyId);
+
 }

@@ -1,5 +1,6 @@
 
 using RouteService.Application.Interfaces;
+using Shared.Extensions;
 
 namespace RouteService.Api.Endpoints
 {
@@ -15,12 +16,20 @@ namespace RouteService.Api.Endpoints
             });
 
             //  Get All Routes for a Specific Employee
-            app.MapGet("employee/{employeeId}/routes", async (Guid employeeId, IRouteService service) =>
+            app.MapGet("/route/employee/routes", async (HttpContext httpContext, IRouteService service) =>
             {
+                var employeeId = httpContext.GetEmployeeId() ?? Guid.Empty;
+
                 var routes = await service.GetRoutesByEmployeeIdAsync(employeeId);
                 return Results.Ok(routes);
             });
-
+            //  Get All Routes for a Specific Company
+            app.MapGet("/route/company/routes", async (HttpContext httpContext, IRouteService service) =>
+            {
+                var companyId = httpContext.GetCompanyId() ?? Guid.Empty;
+                var routes = await service.GetRoutesByEmployeeIdAsync(companyId);
+                return Results.Ok(routes);
+            });
             //  Mark Route as Completed
             app.MapPost("route/{id:guid}/complete", async (Guid id, IRouteService service) =>
             {
@@ -54,6 +63,29 @@ namespace RouteService.Api.Endpoints
                 await service.MarkRouteAsCompletedAsync(id);
                 return Results.Ok($"Route {id} deleted successfully.");
             });
+            
+            // ✅ Generate Routes for a Company
+            app.MapPost("/route/company/generate", async (HttpContext httpContext, IRouteService service) =>
+            {
+                var companyId = httpContext.GetCompanyId();
+                if (companyId is null)
+                {
+                    return Results.BadRequest("Missing company ID.");
+                }
+
+                try
+                {
+                    var generatedRoutes = await service.GenerateRoutesForCompanyAsync(companyId.Value);
+                    return Results.Ok(generatedRoutes);
+                }
+                catch (Exception ex)
+                {
+                    return Results.Problem($"Failed to generate routes: {ex.Message}");
+                }
+            });
+
         }
+        
+        
     }
 }

@@ -29,8 +29,8 @@ public enum MessageTopic
     OrderCreated = 40,
     OrderUpdated = 41,
     OrderCancelled = 42,
-
-    
+    FetchCompanyOrders = 43,
+    CompanyOrdersFetched = 44,
     // Company Events
     CompanyCreated = 50,
     CompanyUpdated = 51,
@@ -40,6 +40,7 @@ public enum MessageTopic
     RouteCreated = 60,
     RouteUpdated = 61,
     RouteCompleted = 62,
-    RouteDelayed = 63
+    RouteDelayed = 63,
+    RouteGenerate = 64
 
 }

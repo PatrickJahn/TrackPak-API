@@ -31,4 +31,16 @@ public static class HttpContextUserClaimsExtensions
         }
         return null; // Return null if not found or invalid
     }
+    /// <summary>
+    /// Retrieves the Company ID from the request headers.
+    /// </summary>
+    public static Guid? GetEmployeeId(this HttpContext httpContext)
+    {
+        if (httpContext.Request.Headers.TryGetValue("X-Employee_Id", out var employeeIdString) &&
+            Guid.TryParse(employeeIdString, out var employeeId))
+        {
+            return employeeId;
+        }
+        return null; // Return null if not found or invalid
+    }
 }

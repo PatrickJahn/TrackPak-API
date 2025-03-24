@@ -10,7 +10,7 @@ namespace RouteService.Application.Services;
 public class RouteService(IRouteRepository routeRepository, IRouteOptimizer routeOptimizer)
     : IRouteService
 {
-    // 1️⃣ Handles Order Created Event (Triggered by Order Service)
+    // Handles Order Created Event (Triggered by Order Service)
     public async Task HandleOrderCreatedAsync(OrderCreatedEvent orderEvent)
     {
         var existingRoutes = await routeRepository.GetRoutesByEmployeeIdAsync(null); // Get unassigned routes
@@ -44,7 +44,7 @@ public class RouteService(IRouteRepository routeRepository, IRouteOptimizer rout
         }
     }
 
-    // 2️⃣ Handles Order Cancellation Event (Triggered by Order Service)
+    // Handles Order Cancellation Event (Triggered by Order Service)
     public async Task HandleOrderCancelledAsync(OrderCancelledEvent orderEvent)
     {
         var employeeRoutes = await routeRepository.GetRoutesByEmployeeIdAsync(null); // Fetch only unassigned routes
@@ -71,7 +71,7 @@ public class RouteService(IRouteRepository routeRepository, IRouteOptimizer rout
         }
     }
 
-    // 3️⃣ Handles Employee Check-In (Triggered by Employee Service)
+    // Handles Employee Check-In (Triggered by Employee Service)
     public async Task HandleEmployeeCheckedInAsync(EmployeeCheckedInEvent employeeEvent)
     {
         // Assign employee to the first available pending route
@@ -86,7 +86,7 @@ public class RouteService(IRouteRepository routeRepository, IRouteOptimizer rout
         }
     }
 
-    // 4️⃣ Handles Employee Check-Out (Triggered by Employee Service)
+    // Handles Employee Check-Out (Triggered by Employee Service)
     public async Task HandleEmployeeCheckedOutAsync(EmployeeCheckedOutEvent employeeEvent)
     {
         var activeRoutes = await routeRepository.GetRoutesByEmployeeIdAsync(employeeEvent.EmployeeId);
@@ -99,13 +99,13 @@ public class RouteService(IRouteRepository routeRepository, IRouteOptimizer rout
         }
     }
 
-    // 5️⃣ Fetches Routes Assigned to an Employee
+    // Fetches Routes Assigned to an Employee
     public async Task<List<Route>> GetRoutesByEmployeeIdAsync(Guid employeeId)
     {
         return await routeRepository.GetRoutesByEmployeeIdAsync(employeeId);
     }
 
-    // 6️⃣ Marks a Route as Completed
+    // Marks a Route as Completed
     public async Task<Route> MarkRouteAsCompletedAsync(Guid routeId)
     {
         var route = await routeRepository.GetRouteByIdAsync(routeId);
@@ -119,7 +119,7 @@ public class RouteService(IRouteRepository routeRepository, IRouteOptimizer rout
         return route;
     }
 
-    // 7️⃣ Optimizes a Route Using PythonWorker (via gRPC)
+    // Optimizes a Route Using PythonWorker (via gRPC)
     public async Task OptimizeRouteAsync(Guid routeId)
     {
         var route = await routeRepository.GetRouteByIdAsync(routeId);
@@ -128,4 +128,36 @@ public class RouteService(IRouteRepository routeRepository, IRouteOptimizer rout
 
         await routeOptimizer.OptimizeRoute(route);
     }
+    public async Task<IEnumerable<Route>> GenerateRoutesForCompanyAsync(Guid companyId)
+    {
+        // 🔄 Fetch unassigned orders for the company from OrderService or repository
+        var orders = await routeRepository.GetUnassignedRoutesAsync();
+
+        if (orders == null || !orders.Any())
+            throw new Exception("No unassigned orders available for route generation.");
+
+        var generatedRoutes = new List<Route>();
+
+        foreach (var orderBatch in orders.Chunk(5)) // Batch orders into routes of 5
+        {
+            var newRoute = new Route
+            {
+                EmployeeId = null,
+                CompanyId = companyId,
+                OrderRoutes = orderBatch.Select((order, index) => new OrderRoute
+                {
+                    Sequence = index + 1,
+                    OrderId = order.Id
+                }).ToList(),
+                Status = RouteStatusEnum.Pending
+            };
+
+            await routeRepository.CreateRouteAsync(newRoute);
+            generatedRoutes.Add(newRoute);
+        }
+
+        return generatedRoutes;
+    }
+
+
 }

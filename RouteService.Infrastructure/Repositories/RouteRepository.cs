@@ -16,6 +16,7 @@ public class RouteRepository(RouteDbContext context) : IRouteRepository
     {
         return await context.Routes
             .Where(r => employeeId == null ? r.EmployeeId == null : r.EmployeeId == employeeId)
+            .Include(r => r.OrderRoutes)
             .ToListAsync();
     }
 
@@ -40,5 +41,23 @@ public class RouteRepository(RouteDbContext context) : IRouteRepository
             context.Routes.Remove(route);
             await context.SaveChangesAsync();
         }
+    }
+
+    // Get unassigned routes (EmployeeId is null)
+    public async Task<List<Route>> GetUnassignedRoutesAsync()
+    {
+        return await context.Routes
+            .Where(r => r.EmployeeId == null)
+            .Include(r => r.OrderRoutes)
+            .ToListAsync();
+    }
+
+    //  Get all routes by CompanyId
+    public async Task<List<Route>> GetRoutesByCompanyIdAsync(Guid companyId)
+    {
+        return await context.Routes
+            .Where(r => r.CompanyId == companyId)
+            .Include(r => r.OrderRoutes)
+            .ToListAsync();
     }
 }
