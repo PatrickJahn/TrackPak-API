@@ -3,6 +3,7 @@ using OrderService.Application.Interfaces;
 using OrderService.Application.Models;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Enums;
+using Shared.Extensions;
 
 namespace OrderService.Api.Endpoints;
 
@@ -15,6 +16,7 @@ public static class OrderEndpoints
         group.MapPost("/", CreateOrderAsync);
         group.MapGet("/{orderId:guid}", GetOrderByIdAsync);
         group.MapGet("/", GetOrdersAsync);
+        group.MapGet("/my-orders", GetMyOrdersAsync);
         group.MapPut("/{orderId:guid}", UpdateOrderAsync);
         group.MapDelete("/{orderId:guid}", DeleteOrderAsync);
         group.MapPatch("/{orderId:guid}/status", UpdateOrderStatusAsync);
@@ -51,7 +53,15 @@ public static class OrderEndpoints
         var orders = await orderService.GetOrdersAsync(userId, companyId, status, cancellationToken);
         return TypedResults.Ok(orders);
     }
-
+    private static async Task<Ok<IEnumerable<Order>>> GetMyOrdersAsync(
+        HttpContext httpContext,
+        IOrderService orderService,
+        CancellationToken cancellationToken)
+    {
+        var userId = httpContext.GetUserId() ?? Guid.Empty;
+        var orders = await orderService.GetMyOrdersAsync(userId, cancellationToken);
+        return TypedResults.Ok(orders);
+    }
     private static async Task<Results<NoContent, NotFound>> UpdateOrderAsync(
         Guid orderId,
         Order updatedOrder,

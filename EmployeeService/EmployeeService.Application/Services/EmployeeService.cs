@@ -85,7 +85,7 @@ public class EmployeeService : IEmployeeService
       PhoneNumber = employeeModel.PhoneNumber,
       Email = employeeModel.Email,
       CompanyId = employeeModel.CompanyId,
-      LocationId = null
+      LocationId = null,
     };
     
     await _employeeRepo.AddAsync(emp);
