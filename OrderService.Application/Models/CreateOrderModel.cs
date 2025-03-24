@@ -15,7 +15,7 @@ public class CreateOrderModel
     public OrderType Type { get; set; }
     public string Description { get; set; }
     
-    public List<OrderItemDto> OrderItems { get; set; }
+    public List<OrderItemDto?> OrderItems { get; set; } = new();
 }
 
 

@@ -17,12 +17,12 @@ namespace OrderService.Application.Services
                 Type = order.Type,
                 CompanyId = order.CompanyId,
                 Description = order.Description,
-                OrderItems = order.OrderItems.Select(x => new OrderItem()
+                OrderItems = order.OrderItems?.Select(x => new OrderItem
                 {
                     Title = x.Title,
                     Price = x.Price,
-                    Quantity = x.Quantity,
-                }).ToList(),
+                    Quantity = x.Quantity
+                }).ToList() ?? new List<OrderItem>()
             };
 
             await orderRepository.AddAsync(newOrder);
@@ -46,7 +46,12 @@ namespace OrderService.Application.Services
         {
             return await orderRepository.GetOrdersAsync(userId, companyId, status, cancellationToken);
         }
-
+        public async Task<IEnumerable<Order>> GetMyOrdersAsync(
+            Guid userId,
+            CancellationToken cancellationToken = default)
+        {
+            return await orderRepository.GetOrdersAsync(userId, null, null, cancellationToken);
+        }
         public async Task<bool> UpdateOrderAsync(Guid orderId, Order updatedOrder, CancellationToken cancellationToken = default)
         {
             var existingOrder = await orderRepository.GetByIdAsync(orderId);

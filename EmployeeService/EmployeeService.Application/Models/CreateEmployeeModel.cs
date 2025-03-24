@@ -12,9 +12,6 @@ public record CreateEmployeeModel()
   
   public Guid CompanyId { get; set; }
   
-  public UserRole Role { get; set; }
-  
-  
   
   public CreateLocationRequestModel Location { get; set; }
 }

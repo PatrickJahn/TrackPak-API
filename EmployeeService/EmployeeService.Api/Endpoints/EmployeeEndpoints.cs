@@ -51,10 +51,7 @@ public static class EmployeeEndpoints
         await service.CheckOut(id);
         return Results.Ok();
     }
-
-
-
-
+    
     private static async Task<IResult> GetMyEmployeeProfileAsync(HttpContext httpContext, IEmployeeService service)
     {
         var userId = httpContext.GetUserId();
