@@ -17,8 +17,6 @@ public static class TrackingWebsockets
         {
            await webSocketManager.HandleWebSocket(context);
         });
-        
-       
     }
 }
 

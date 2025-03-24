@@ -9,8 +9,8 @@ using System.Text.Json;
 
 public class WebSocketManager
 {
-    private static readonly Dictionary<Guid, WebSocket> _employees = new(); // Employee connections
-    private static readonly Dictionary<Guid, List<WebSocket>> _userListeners = new(); // EmployeeId -> List of users tracking them
+    private static readonly Dictionary<Guid, WebSocket> _employees = new();
+    private static readonly Dictionary<Guid, List<WebSocket>> _userListeners = new();
 
     public async Task HandleWebSocket(HttpContext context)
     {
@@ -19,73 +19,78 @@ public class WebSocketManager
             context.Response.StatusCode = 400;
             return;
         }
-        
-        var employeeId = context.Request.Query["employeeId"].ToString();
-        var userId = context.Request.Query["userId"].ToString(); // Only provided by users
 
-        // If employeeId is not a valid guid - close connection
-        if (!Guid.TryParse(employeeId, out var empGuid))
+        try
         {
+            var employeeId = context.Request.Query["employeeId"].ToString();
+            var userId = context.Request.Query["userId"].ToString();
+
+            if (!Guid.TryParse(employeeId, out var empGuid))
+                throw new Exception($"Invalid employee id: {employeeId}");
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                if (!Guid.TryParse(userId, out var userGuid))
+                {
+                    context.Response.StatusCode = 400;
+                    throw new Exception($"Invalid user id: {userId}");
+                }
+
+                if (!_employees.ContainsKey(empGuid)) // Employee must be online first
+                {
+                    context.Response.StatusCode = 404;
+                    throw new Exception($"Employee is not connected");
+                }
+            }
+
+            using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                if (!_userListeners.ContainsKey(empGuid))
+                    _userListeners[empGuid] = new List<WebSocket>();
+
+                _userListeners[empGuid].Add(webSocket);
+                await WaitForDisconnect(webSocket, empGuid);
+            }
+            else
+            {
+                _employees[empGuid] = webSocket;
+                await ReceiveAndBroadcastLocation(empGuid, webSocket);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"WebSocket Error: {ex.Message}");
             context.Response.StatusCode = 400;
-            throw new Exception($"Invalid employee id: {employeeId}");
-        }
-        
-        // Users can only connect if the employee is already online
-        if (!string.IsNullOrEmpty(userId))
-        {
-            if (!Guid.TryParse(userId, out var userGuid))
-            {
-                context.Response.StatusCode = 400;
-                throw new Exception($"Invalid user id: {userId}");
-            }
-
-            if (!_employees.ContainsKey(empGuid)) // Employee must be online first
-            {
-                context.Response.StatusCode = 404;
-                throw new Exception($"Employee is not connected");
-            }
-        }
-    
-        
-        using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-
-        var isUserConnecting = !string.IsNullOrEmpty(userId);
-        
-        if (isUserConnecting)
-        {
-            //  User connection: Add user to the employee's listeners
-            if (!_userListeners.ContainsKey(empGuid))
-            {
-                _userListeners[empGuid] = new List<WebSocket>();
-            }
-            _userListeners[empGuid].Add(webSocket);
-            await WaitForDisconnect(webSocket, empGuid);
-        }
-        else    
-        {
-            // Employee connection: Register employee's WebSocket
-            _employees[empGuid] = webSocket;
-            await ReceiveAndBroadcastLocation(empGuid, webSocket);
         }
     }
 
     private async Task ReceiveAndBroadcastLocation(Guid employeeId, WebSocket senderSocket)
     {
         var buffer = new byte[1024 * 4];
-
-        while (senderSocket.State == WebSocketState.Open)
+        try
         {
-            var result = await senderSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            if (result.MessageType == WebSocketMessageType.Close)
+            while (senderSocket.State == WebSocketState.Open)
             {
-                break;
+                var result = await senderSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                if (result.MessageType == WebSocketMessageType.Close)
+                    break;
+
+                var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                await BroadcastToUsers(employeeId, message);
             }
-
-            var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-            await BroadcastToUsers(employeeId, message);
         }
-
-        _employees.Remove(employeeId);
+        catch (WebSocketException ex)
+        {
+            Console.WriteLine($"WebSocket closed unexpectedly: {ex.Message}");
+        }
+        finally
+        {
+            _employees.Remove(employeeId);
+            if (senderSocket.State != WebSocketState.Closed)
+                await senderSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by server", CancellationToken.None);
+        }
     }
 
     private async Task BroadcastToUsers(Guid employeeId, string message)
@@ -95,24 +100,40 @@ public class WebSocketManager
         var messageBytes = Encoding.UTF8.GetBytes(message);
         var buffer = new ArraySegment<byte>(messageBytes);
 
-        foreach (var userSocket in _userListeners[employeeId].Where(l => l.State == WebSocketState.Open))
+        foreach (var userSocket in _userListeners[employeeId].Where(l => l.State == WebSocketState.Open).ToList())
         {
-            await userSocket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+            try
+            {
+                await userSocket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+            catch (WebSocketException ex)
+            {
+                Console.WriteLine($"Failed to send to user: {ex.Message}");
+            }
         }
     }
 
     private async Task WaitForDisconnect(WebSocket socket, Guid employeeId)
     {
         var buffer = new byte[1024];
-        while (socket.State == WebSocketState.Open)
+        try
         {
-            var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            if (result.MessageType == WebSocketMessageType.Close)
+            while (socket.State == WebSocketState.Open)
             {
-                break;
+                var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                if (result.MessageType == WebSocketMessageType.Close)
+                    break;
             }
         }
-
-        _userListeners[employeeId]?.Remove(socket);
+        catch (WebSocketException ex)
+        {
+            Console.WriteLine($"User WebSocket closed unexpectedly: {ex.Message}");
+        }
+        finally
+        {
+            _userListeners[employeeId]?.Remove(socket);
+            if (socket.State != WebSocketState.Closed)
+                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "User disconnected", CancellationToken.None);
+        }
     }
 }
