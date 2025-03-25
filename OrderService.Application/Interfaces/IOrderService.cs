@@ -12,6 +12,10 @@ namespace OrderService.Application.Interfaces
             Guid? companyId, 
             OrderStatus? status, 
             CancellationToken cancellationToken = default);
+
+        Task<IEnumerable<Order>> GetMyOrdersAsync(
+            Guid userId, 
+            CancellationToken cancellationToken = default);
         Task<bool> UpdateOrderAsync(Guid orderId, Order updatedOrder, CancellationToken cancellationToken = default);
         Task<bool> DeleteOrderAsync(Guid orderId, CancellationToken cancellationToken = default);
         Task<bool> UpdateOrderStatusAsync(Guid orderId, OrderStatus newStatus, CancellationToken cancellationToken = default);

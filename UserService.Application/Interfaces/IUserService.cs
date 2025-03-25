@@ -15,5 +15,7 @@ public interface IUserService
     public Task DeleteUserAsync(Guid userId,  CancellationToken cancellationToken);
 
     public Task<Guid> CreateUser(CreateUserModel userModel, CancellationToken cancellationToken);
+    
+    public Task<Guid> GetUserByEmailAsync(string email,  CancellationToken cancellationToken);
 
 }

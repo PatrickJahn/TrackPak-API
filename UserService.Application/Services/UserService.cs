@@ -107,6 +107,13 @@ public class UserService: IUserService
         return user.Id;
     }
 
+    public async Task<Guid> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        var user = await _userRepo.GetByEmailAsync(email, cancellationToken);
+
+        return user.Id;
+    }
+
     private async Task CheckIfUserExistWithEmail(string email, CancellationToken cancellationToken)
     {
       var emailInUse = await _userRepo.GetByEmailAsync(email, cancellationToken);
@@ -122,9 +129,7 @@ public class UserService: IUserService
         if(phoneInUse is not null)
             throw new ConflictException($"Phonenumber {phoneNumber} already exists");
     }
-
-
-  
+    
 }
     
     

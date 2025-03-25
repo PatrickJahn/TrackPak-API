@@ -16,7 +16,7 @@ public static class DependencyInjection
         
         // MessageHandlers
         services.AddScoped<IMessageHandler<OrderLocationCreatedEvent>, OrderLocationCreatedHandler>();
-        services.AddScoped<IMessageHandler<OrderUserCreatedEvent>, OrderUserCreatedHandler>();
+        services.AddScoped<IMessageHandler<OrderUserCreatedEvent>, OrderUserCreatedEventHandler>();
 
     }
 
