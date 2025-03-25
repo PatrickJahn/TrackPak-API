@@ -6,7 +6,10 @@ namespace Shared.Interfaces;
 public interface IBaseRepository<TEntity> where TEntity : class
 {
     Task<TEntity> GetByIdAsync(Guid id);
-    Task<TEntity?> GetOrDefaultByIdAsync(Guid id);
+
+    public Task<TEntity?> GetOrDefaultByIdAsync(Guid id);
+    public Task<TEntity?> GetOrDefaultByIdAsync(Guid id,
+        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>>? include = null);
 
     Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
     

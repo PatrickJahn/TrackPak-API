@@ -1,6 +1,8 @@
+using Monitoring;
+
 namespace Shared.Messaging.Events.Route;
 
-public class RouteDelayedEvent
+public class RouteDelayedEvent : TracedMessage
 {
     public Guid RouteId { get; set; }
     public TimeSpan DelayDuration { get; set; }

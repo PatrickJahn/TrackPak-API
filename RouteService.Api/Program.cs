@@ -22,6 +22,7 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseMiddleware<GatewayRestrictionMiddleware>();
+app.UseMiddleware<TracingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();

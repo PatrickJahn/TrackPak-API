@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using Monitoring;
 using OrderService.Domain.Interfaces;
 using Shared.Messaging;
 using Shared.Messaging.Events.Location;
@@ -11,7 +13,6 @@ public class OrderLocationCreatedHandler(IOrderRepository orderRepository)
     public async Task HandleAsync(OrderLocationCreatedEvent message, CancellationToken cancellationToken)
     {
         Console.WriteLine($"Updating order {message.OrderId} with location {message.LocationId}");
-
         
         var order = await orderRepository.GetOrDefaultByIdAsync(message.OrderId);
 

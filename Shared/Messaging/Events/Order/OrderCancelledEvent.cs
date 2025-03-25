@@ -1,8 +1,9 @@
+using Monitoring;
 using Shared.Models;
 
 namespace Shared.Messaging.Events.Order;
 
-public class OrderCancelledEvent
+public class OrderCancelledEvent : TracedMessage
 {
     public Guid OrderId { get; set; }  
     public Guid CustomerId { get; set; }  // ID of the customer who placed the order

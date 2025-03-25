@@ -25,11 +25,24 @@ public class BaseRepository<TEntity, TContext> : IBaseRepository<TEntity> where 
                 
         return ret;
     }
+    
+    
+    public async Task<TEntity?> GetOrDefaultByIdAsync(Guid id){
+      IQueryable<TEntity> query = _dbContext.Set<TEntity>();
+      
+      // Query by ID and return the result
+      return await query.FirstOrDefaultAsync(e => e.Id == id);
+    }
 
-    public async Task<TEntity?> GetOrDefaultByIdAsync(Guid id)
+    public async Task<TEntity?> GetOrDefaultByIdAsync(Guid id, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>>? include = null)
     {
         // Start building the query
         IQueryable<TEntity> query = _dbContext.Set<TEntity>();
+        
+        if (include != null)
+        {
+          query = include(query); // Apply the includes
+        }
         
         // Query by ID and return the result
         return await query.FirstOrDefaultAsync(e => e.Id == id);

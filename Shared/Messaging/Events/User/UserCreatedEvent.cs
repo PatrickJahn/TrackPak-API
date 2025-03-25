@@ -1,8 +1,9 @@
+using Monitoring;
 using Shared.Models;
 
 namespace Shared.Messaging.Events.User;
 
-public class UserCreatedEvent
+public class UserCreatedEvent : TracedMessage
 {
     
     public Guid UserId { get; set; }
