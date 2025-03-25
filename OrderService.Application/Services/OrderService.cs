@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using Monitoring;
 using OrderService.Application.Interfaces;
 using OrderService.Application.Models;
 using OrderService.Domain.Entities;
@@ -12,18 +15,23 @@ namespace OrderService.Application.Services
         public async Task<Order> CreateOrderAsync(CreateOrderModel order, CancellationToken cancellationToken = default)
         {
      
-            var newOrder = new Order()
-            {
-                Type = order.Type,
-                CompanyId = order.CompanyId,
-                Description = order.Description,
-                OrderItems = order.OrderItems.Select(x => new OrderItem()
-                {
-                    Title = x.Title,
-                    Price = x.Price,
-                    Quantity = x.Quantity,
-                }).ToList(),
-            };
+            
+            using var activity = LoggingService.activitySource.StartActivity("CreateOrder", ActivityKind.Internal);          
+            activity?.SetTag("company.id", order.CompanyId);
+            
+          var newOrder = new Order
+          {
+              Type = order.Type,
+              CompanyId = order.CompanyId,
+              Description = order.Description,
+              OrderItems = order.OrderItems
+                  .Select(x => new OrderItem
+                  {
+                      Title = x.Title,
+                      Price = x.Price,
+                      Quantity = x.Quantity,
+                  }).ToList(),
+          };
 
             await orderRepository.AddAsync(newOrder);
 
@@ -35,7 +43,10 @@ namespace OrderService.Application.Services
 
         public async Task<Order?> GetOrderByIdAsync(Guid orderId, CancellationToken cancellationToken = default)
         {
-            return await orderRepository.GetByIdAsync(orderId);
+            using var activity = LoggingService.activitySource.StartActivity("GetOrderById", ActivityKind.Internal);
+            activity?.SetTag("order.id", orderId);
+            
+            return await orderRepository.GetOrDefaultByIdAsync(orderId, (i) => i.Include(o => o.OrderItems));
         }
 
         public async Task<IEnumerable<Order>> GetOrdersAsync(
@@ -44,11 +55,17 @@ namespace OrderService.Application.Services
             OrderStatus? status, 
             CancellationToken cancellationToken = default)
         {
+                        
+            using var activity = LoggingService.activitySource.StartActivity("GetOrdersAsync", ActivityKind.Internal);
+
             return await orderRepository.GetOrdersAsync(userId, companyId, status, cancellationToken);
         }
 
         public async Task<bool> UpdateOrderAsync(Guid orderId, Order updatedOrder, CancellationToken cancellationToken = default)
         {
+            using var activity = LoggingService.activitySource.StartActivity("UpdateOrder", ActivityKind.Internal);
+            activity?.SetTag("order.id", orderId);
+            
             var existingOrder = await orderRepository.GetByIdAsync(orderId);
             if (existingOrder == null) return false;
 

@@ -31,6 +31,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 //app.UseMiddleware<GatewayRestrictionMiddleware>();
+app.UseMiddleware<TracingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();

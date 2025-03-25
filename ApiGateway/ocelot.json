@@ -109,6 +109,11 @@
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://apigateway"
+    "BaseUrl": "http://apigateway",
+    "RequestIdKey": "OcRequestId",
+    "DownstreamHeaderTransform": {
+      "traceparent": "{RequestHeader:traceparent}",
+      "tracestate": "{RequestHeader:tracestate}"
+    }
   }
 }

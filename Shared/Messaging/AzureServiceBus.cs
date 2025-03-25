@@ -1,6 +1,7 @@
 using Azure.Messaging.ServiceBus;
 using System;
 using System.Threading.Tasks;
+using Monitoring;
 using Shared.Messaging.Topics;
 
 namespace Shared.Messaging;
@@ -10,14 +11,14 @@ public class AzureServiceBus(string connectionString) : IMessageBus
 {
     private readonly ServiceBusClient _client = new ServiceBusClient(connectionString);
 
-    public async Task PublishAsync<T>(MessageTopic topic, T message)
+    public async Task PublishAsync<T>(MessageTopic topic, T message) where T : TracedMessage
     {
         var sender = _client.CreateSender(Enum.GetName(topic));
 
         var serviceBusMessage = new ServiceBusMessage(message?.ToString());
         await sender.SendMessageAsync(serviceBusMessage);    }
 
-    public Task SubscribeAsync<T>(MessageTopic topic, string subscriberId, Action<T> handler)
+    public Task SubscribeAsync<T>(MessageTopic topic, string subscriberId, Action<T> handler) where T : TracedMessage
     {
         throw new NotImplementedException();
     }

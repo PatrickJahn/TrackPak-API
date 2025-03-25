@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using System.Text.Json;
 using ApiGateway.Security.Roles;
 using ApiGateway.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using Monitoring;
 using Ocelot.Authorization;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
@@ -84,6 +86,7 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMiddleware<TracingMiddleware>();
 app.UseMiddleware<OcelotHeaderMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
@@ -104,6 +107,8 @@ app.Use(async (context, next) =>
     }
     await next();
 });
+
+
 app.UseWebSockets();
 
 app.UseOcelot().Wait();

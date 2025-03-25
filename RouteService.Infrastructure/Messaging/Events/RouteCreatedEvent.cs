@@ -1,8 +1,9 @@
+using Monitoring;
 using RouteService.Domain.Entities;
 
 namespace RouteService.Infrastructure.Messaging.Events;
 
-public class RouteCreatedEvent
+public class RouteCreatedEvent: TracedMessage
 {
     public Guid RouteId { get; set; }
     public Guid CompanyId { get; set; }

@@ -1,6 +1,8 @@
+using Monitoring;
+
 namespace Shared.Messaging.Events.Route;
 
-public class RouteAssignedEvent
+public class RouteAssignedEvent : TracedMessage
 {
     
 }
