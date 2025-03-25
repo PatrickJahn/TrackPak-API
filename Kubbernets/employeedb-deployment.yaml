@@ -1,0 +1,60 @@
+# postgres-template.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee-db
+  namespace: trackpak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: employee-db
+  template:
+    metadata:
+      labels:
+        app: employee-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          env:
+            - name: POSTGRES_USER
+              value: developer
+            - name: POSTGRES_PASSWORD
+              value: trackPak_dev_password
+            - name: POSTGRES_DB
+              value: trackpak-employeedb
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: employee-db-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: employee-db-data
+          persistentVolumeClaim:
+            claimName: employee-db-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: employee-db-pvc
+  namespace: trackpak
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: employee-db
+  namespace: trackpak
+spec:
+  selector:
+    app: employee-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP

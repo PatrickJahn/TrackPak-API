@@ -1,0 +1,39 @@
+# company-service-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: company-service
+  namespace: trackpak
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: company-service
+  template:
+    metadata:
+      labels:
+        app: company-service
+    spec:
+      containers:
+        - name: company-service
+          image: trackpak-companyservice
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+            - name: ConnectionStrings__Postgres
+              value: Host=company-db;Port=5432;Database=trackpak-companydb;Username=developer;Password=trackPak_dev_password
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: company-service
+  namespace: trackpak
+spec:
+  selector:
+    app: company-service
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
