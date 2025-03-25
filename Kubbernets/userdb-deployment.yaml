@@ -1,0 +1,60 @@
+# postgres-template.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-db
+  namespace: trackpak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-db
+  template:
+    metadata:
+      labels:
+        app: user-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          env:
+            - name: POSTGRES_USER
+              value: developer
+            - name: POSTGRES_PASSWORD
+              value: trackPak_dev_password
+            - name: POSTGRES_DB
+              value: trackpak-userdb
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: user-db-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: user-db-data
+          persistentVolumeClaim:
+            claimName: user-db-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: user-db-pvc
+  namespace: trackpak
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-db
+  namespace: trackpak
+spec:
+  selector:
+    app: user-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP

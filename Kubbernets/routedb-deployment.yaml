@@ -1,0 +1,60 @@
+# postgres-template.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: route-db
+  namespace: trackpak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: route-db
+  template:
+    metadata:
+      labels:
+        app: route-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          env:
+            - name: POSTGRES_USER
+              value: developer
+            - name: POSTGRES_PASSWORD
+              value: trackPak_dev_password
+            - name: POSTGRES_DB
+              value: trackpak-routedb
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: route-db-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: route-db-data
+          persistentVolumeClaim:
+            claimName: route-db-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: route-db-pvc
+  namespace: trackpak
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: route-db
+  namespace: trackpak
+spec:
+  selector:
+    app: route-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
