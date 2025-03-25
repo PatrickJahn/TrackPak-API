@@ -7,8 +7,6 @@ public enum MessageTopic
     UserCreated = 10,
     UserLocationUpdated = 12,
     OrderUserCreated = 13,
-
-
     
     // Location events
     UserLocationCreated = 20,
@@ -23,14 +21,13 @@ public enum MessageTopic
     EmployeeCheckedIn = 33,
     EmployeeCheckedOut = 34,
 
-
-
     // Order Events
     OrderCreated = 40,
     OrderUpdated = 41,
     OrderCancelled = 42,
     FetchCompanyOrders = 43,
     CompanyOrdersFetched = 44,
+    
     // Company Events
     CompanyCreated = 50,
     CompanyUpdated = 51,
