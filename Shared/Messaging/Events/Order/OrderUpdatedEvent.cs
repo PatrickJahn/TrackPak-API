@@ -1,8 +1,9 @@
+using Monitoring;
 using Shared.Models;
 
 namespace Shared.Messaging.Events.Order;
 
-public class OrderUpdatedEvent
+public class OrderUpdatedEvent : TracedMessage
 {
     public Guid OrderId { get; set; }
     public OrderStatusRequest Status { get; set; } // e.g., "In Progress", "Completed"

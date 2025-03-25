@@ -1,6 +1,8 @@
+using Monitoring;
+
 namespace Shared.Messaging.Events.Employee;
 
-public class EmployeeCheckedOutEvent
+public class EmployeeCheckedOutEvent  : TracedMessage
 {
     public Guid EmployeeId { get; set; } = Guid.Empty;
     public DateTime CheckedOutAt { get; set; } = DateTime.UtcNow;

@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using Monitoring;
 using OrderService.Application.Interfaces;
 using OrderService.Application.Models;
 using OrderService.Domain.Entities;
@@ -12,6 +14,10 @@ namespace OrderService.Application.Services
         public async Task<Order> CreateOrderAsync(CreateOrderModel order, CancellationToken cancellationToken = default)
         {
      
+            
+            using var activity = LoggingService.activitySource.StartActivity("CreateOrder", ActivityKind.Internal);          
+            activity?.SetTag("company.id", order.CompanyId);
+            
             var newOrder = new Order()
             {
                 Type = order.Type,
@@ -44,6 +50,9 @@ namespace OrderService.Application.Services
             OrderStatus? status, 
             CancellationToken cancellationToken = default)
         {
+                        
+            using var activity = LoggingService.activitySource.StartActivity("GetOrdersAsync", ActivityKind.Internal);
+
             return await orderRepository.GetOrdersAsync(userId, companyId, status, cancellationToken);
         }
         public async Task<IEnumerable<Order>> GetMyOrdersAsync(
@@ -54,6 +63,9 @@ namespace OrderService.Application.Services
         }
         public async Task<bool> UpdateOrderAsync(Guid orderId, Order updatedOrder, CancellationToken cancellationToken = default)
         {
+            using var activity = LoggingService.activitySource.StartActivity("UpdateOrder", ActivityKind.Internal);
+            activity?.SetTag("order.id", orderId);
+            
             var existingOrder = await orderRepository.GetByIdAsync(orderId);
             if (existingOrder == null) return false;
 

@@ -81,6 +81,7 @@ services:
     depends_on:
       - rabbitmq
       - order-db
+      - zipkin
     deploy:
       replicas: 2
     restart: unless-stopped
@@ -248,7 +249,26 @@ services:
     networks:
       - trackpak-network
         
+        
+  seq:
+    image: datalust/seq:latest
+    ports:
+      - 5341:5341 # Exposing Seq on localhost:5341
+      - 5342:80 # Exposing Seq on localhost:5342
+    environment:
+      ACCEPT_EULA: Y
+    networks:
+      - trackpak-network
   
+  
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - 9411:9411 # Exposing Zipkin on localhost:9411
+    networks:
+      - trackpak-network
+
+
 
 networks:
   trackpak-network:

@@ -1,8 +1,9 @@
+using Monitoring;
 using Shared.Models;
 
 namespace Shared.Messaging.Events.Order;
 
-public class OrderCreatedEvent
+public class OrderCreatedEvent : TracedMessage
 {
     public Guid OrderId { get; set; }
     

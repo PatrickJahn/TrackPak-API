@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Net.Sockets;
+using Monitoring;
 using Shared.Exceptions;
 using Shared.Messaging;
 using Shared.Messaging.Events.User;
@@ -25,11 +27,19 @@ public class UserService: IUserService
 
     public async Task<User> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)
     {
+        using var activity = LoggingService.activitySource.StartActivity("UserService.GetUserById", ActivityKind.Internal);
+        activity?.SetTag("user.id", userId);
+        
        return await _userRepo.GetByIdAsync(userId);
     }
 
     public async Task<User> UpdateUserAsync(Guid userId, UpdateUserModel userModel, CancellationToken cancellationToken)
     {
+        
+        using var activity = LoggingService.activitySource.StartActivity("UserService.UpdateUser", ActivityKind.Internal);
+        activity?.SetTag("user.id", userId);
+        activity?.SetTag("user.email", userModel.Email);
+        activity?.SetTag("user.phone", userModel.PhoneNumber);
         
         // TODO: Improve 
         await CheckIfUserExistWithEmail(userModel.Email, cancellationToken);
@@ -49,6 +59,11 @@ public class UserService: IUserService
 
     public async Task UpdateUserLocationAsync(Guid userId, CreateLocationRequestModel locationModel, CancellationToken cancellationToken)
     {
+        
+        using var activity = LoggingService.activitySource.StartActivity("UserService.UpdateUserLocation", ActivityKind.Internal);
+        activity?.SetTag("user.id", userId);
+        activity?.SetTag("location.city", locationModel.City);
+        activity?.SetTag("location.country", locationModel.Country);
 
         var userExists = await _userRepo.ExistsAsync(userId);
         if (!userExists)
@@ -67,6 +82,11 @@ public class UserService: IUserService
 
     public async Task<Guid> CreateUser(CreateUserModel userModel, CancellationToken cancellationToken)
     {
+        
+        using var activity = LoggingService.activitySource.StartActivity("UserService.CreateUser", ActivityKind.Internal);
+        activity?.SetTag("user.email", userModel.Email);
+        activity?.SetTag("user.phone", userModel.PhoneNumber);
+
         
         // TODO: Improve 
         await CheckIfUserExistWithEmail(userModel.Email, cancellationToken);
