@@ -32,7 +32,7 @@ public static class HttpContextUserClaimsExtensions
         return null; // Return null if not found or invalid
     }
     /// <summary>
-    /// Retrieves the Company ID from the request headers.
+    /// Retrieves the Employee ID from the request headers.
     /// </summary>
     public static Guid? GetEmployeeId(this HttpContext httpContext)
     {
@@ -42,5 +42,37 @@ public static class HttpContextUserClaimsExtensions
             return employeeId;
         }
         return null; // Return null if not found or invalid
+    }
+    /// <summary>
+    /// Retrieves all roles from the request headers (comma-separated).
+    /// </summary>
+    public static List<string> GetRoles(this HttpContext httpContext)
+    {
+        if (httpContext.Request.Headers.TryGetValue("X-Roles", out var rolesString))
+        {
+            return rolesString
+                .ToString()
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToList();
+        }
+
+        return new List<string>(); // Return empty list if not found
+    }
+
+    /// <summary>
+    /// Helper to check if the user has a specific role.
+    /// </summary>
+    public static bool HasRole(this HttpContext httpContext, string role)
+    {
+        var roles = httpContext.GetRoles();
+        return roles.Contains(role, StringComparer.OrdinalIgnoreCase);
+    }
+    
+    public static class RoleAsString
+    {
+        public const string Customer = "Customer";
+        public const string CompanyAdmin = "CompanyAdmin"; 
+        public const string Driver = "Driver"; 
+        public const string SystemAdmin = "SystemAdmin";
     }
 }

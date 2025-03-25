@@ -11,20 +11,35 @@ public static class EmployeeEndpoints
     public static void MapEmployeeEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/employee");
+        group.MapGet("/{id}", GetEmployeeByIdAsync)
+            .RequireAuthorization(PolicyRoles.CompanyAdmin);
 
-        group.MapGet("/{id}", GetEmployeeByIdAsync);
-        group.MapGet("/me", GetMyEmployeeProfileAsync);
-        group.MapGet("/by-company/{companyId}", GetEmployeesByCompanyIdAsync);
-        group.MapGet("/", GetEmployeesAsync);
-        group.MapGet("/by-email/{email}", GetEmployeeByEmailAsync);
+        group.MapGet("/me", GetMyEmployeeProfileAsync)
+            .RequireAuthorization(PolicyRoles.Driver);
 
-        group.MapPost("/", CreateEmployeeAsync);
-        group.MapPut("/{id}", UpdateEmployeeAsync);
-        group.MapDelete("/{id}", DeleteEmployeeAsync);
-        
-        group.MapPost("/{id}/check-in", CheckIn);
-        group.MapPost("/{id}/check-out", CheckOut);
+        group.MapGet("/by-company/{companyId}", GetEmployeesByCompanyIdAsync)
+            .RequireAuthorization(PolicyRoles.CompanyAdmin);
 
+        group.MapGet("/", GetEmployeesAsync)
+            .RequireAuthorization(PolicyRoles.CompanyAdmin);
+
+        group.MapGet("/by-email/{email}", GetEmployeeByEmailAsync)
+            .RequireAuthorization("RequireWritReadeEmployees");
+
+        group.MapPost("/", CreateEmployeeAsync)
+            .RequireAuthorization("RequireWritReadeEmployees");
+
+        group.MapPut("/{id}", UpdateEmployeeAsync)
+            .RequireAuthorization(PolicyRoles.CompanyAdmin);
+
+        group.MapDelete("/{id}", DeleteEmployeeAsync)
+            .RequireAuthorization(PolicyRoles.SystemAdmin);
+
+        group.MapPost("/{id}/check-in", CheckIn)
+            .RequireAuthorization(PolicyRoles.Driver);
+
+        group.MapPost("/{id}/check-out", CheckOut)
+            .RequireAuthorization(PolicyRoles.Driver);
 
     }
 
@@ -82,8 +97,8 @@ public static class EmployeeEndpoints
 
     private static async Task<IResult> CreateEmployeeAsync([FromBody] CreateEmployeeModel request, IEmployeeService service)
     {
-        await service.CreateEmployeeAsync(request);
-        return Results.Ok();
+        var id = await service.CreateEmployeeAsync(request);
+        return Results.Ok(id);
     }
 
     private static async Task<IResult> UpdateEmployeeAsync(Guid id, [FromBody] UpdateEmployeeModel employeeModel, IEmployeeService service)

@@ -4,15 +4,8 @@ using Monitoring;
 
 namespace Shared.Middelware;
 
-public class TracingMiddleware
+public class TracingMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate _next;
-
-    public TracingMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
-
     public async Task InvokeAsync(HttpContext context)
     {
         var parentContext = ActivityHelper.ExtractPropagationContextFromHttpRequest(context.Request);
@@ -29,7 +22,7 @@ public class TracingMiddleware
 
         try
         {
-            await _next(context);
+            await next(context);
         }
         catch (Exception ex)
         {

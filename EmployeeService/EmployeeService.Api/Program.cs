@@ -1,6 +1,7 @@
 ﻿using EmployeeService.Api.Endpoints;
 using EmployeeService.Application;
 using EmployeeService.Infrastructure;
+using Shared.Extensions;
 using Shared.Middelware;
 
 
@@ -12,10 +13,13 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddAuthentication();
+builder.Services.AddTrackPakAuthenticationAndAuthorization(builder.Configuration);
 
 var app = builder.Build();
 
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseMiddleware<TracingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

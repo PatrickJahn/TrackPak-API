@@ -1,5 +1,6 @@
 using Monitoring;
 using RouteService.Domain.Entities;
+using Shared.Monitoring;
 
 namespace RouteService.Infrastructure.Messaging.Events;
 

@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using ApiGateway.Security.Roles;
+using Shared.Security;
 
 namespace ApiGateway.Services;
 

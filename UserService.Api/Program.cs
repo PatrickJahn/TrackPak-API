@@ -1,3 +1,4 @@
+using Shared.Extensions;
 using Shared.Middelware;
 using UserService.Api.Endpoints;
 using UserService.Application;
@@ -11,6 +12,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddTrackPakAuthenticationAndAuthorization(builder.Configuration);
 
 
 // builder.Services.Configure<GatewaySettings>(options =>

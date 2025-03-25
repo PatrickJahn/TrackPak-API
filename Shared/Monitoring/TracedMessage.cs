@@ -1,4 +1,4 @@
-namespace Monitoring;
+namespace Shared.Monitoring;
 
 public class TracedMessage
 {

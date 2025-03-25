@@ -1,4 +1,5 @@
 using Monitoring;
+using Shared.Monitoring;
 
 namespace Shared.Messaging.Events.Location;
 

@@ -2,11 +2,15 @@ services:
   rabbitmq:
     image: "rabbitmq:3-management"
     container_name: rabbitmq
+    volumes:
+      - ./rabbitmq_definitions.json:/etc/rabbitmq/definitions.json
     ports:
       - "5672:5672"   # RabbitMQ message broker port
       - "15672:15672" # RabbitMQ management UI
     networks:
       - trackpak-network
+    environment:
+      - RABBITMQ_LOAD_DEFINITIONS=/etc/rabbitmq/definitions.json
 
   api-gateway:
     image: trackpak-apigateway

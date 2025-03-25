@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Shared.Security;
 
 namespace ApiGateway.Security.Roles;
 
