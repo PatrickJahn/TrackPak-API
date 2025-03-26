@@ -1,5 +1,6 @@
 using Monitoring;
 using Shared.Messaging.Topics;
+using Shared.Monitoring;
 
 namespace Shared.Messaging;
 

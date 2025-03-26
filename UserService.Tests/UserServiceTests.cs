@@ -1,15 +1,7 @@
-﻿
-using System;
-using System.Threading.Tasks;
-using Xunit;
-using Moq;
+﻿using Moq;
 using FluentAssertions;
 using Shared.Exceptions;
-using Shared.Messaging;
-using Shared.Messaging.Events.User;
-using Shared.Messaging.Topics;
 using Shared.Models;
-using Shared.Services;
 using UserService.Application.Interfaces;
 using UserService.Application.Models;
 using UserService.Domain.Repositories;

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Extensions;
 using Shared.Models;
+using Shared.Security;
 using UserService.Api.Dtos;
 using UserService.Application.Interfaces;
 using UserService.Application.Models;
@@ -16,13 +17,20 @@ public static class UserEndpoints
     {
         var group = app.MapGroup("/user");
         
-        group.MapPost("/", CreateUserAsync);
-        group.MapGet("/{id}", GetUserByIdAsync);
-        group.MapGet("/me", GetMeAsync);
+        group.MapPost("/", CreateUserAsync)
+            .RequireAuthorization(PolicyRoles.SystemAdmin);
 
-        group.MapPut("/{id}", UpdateUserAsync);
-        group.MapDelete("/{id}", UpdateUserAsync);
-        group.MapPut("/{id}", UpdateUserAsync);
+        group.MapGet("/{id}", GetUserByIdAsync)
+            .RequireAuthorization(PolicyRoles.CompanyAdmin);
+
+        group.MapGet("/me", GetMeAsync)
+            .RequireAuthorization();  
+
+        group.MapPut("/{id}", UpdateUserAsync)
+            .RequireAuthorization(PolicyRoles.CompanyAdmin);
+
+        group.MapDelete("/{id}", DeleteUserAsync)
+            .RequireAuthorization(PolicyRoles.SystemAdmin);
 
     }
 

@@ -1,7 +1,10 @@
 using CompanyService.Api.Endpoints;
 using CompanyService.Application;
 using CompanyService.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
+using Shared.Extensions;
 using Shared.Middelware;
+using Shared.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,9 @@ builder.Services.AddApplication();
 
 //builder.Services.Configure<GatewaySettings>(options =>
   //  options.AllowedGateways = builder.Configuration.GetSection("AllowedGateways").Get<string[]>() ?? Array.Empty<string>());
+
+builder.Services.AddTrackPakAuthenticationAndAuthorization(builder.Configuration);
+builder.Services.AddSingleton<IAuthorizationHandler, RoleHandler>();
 
 var app = builder.Build();
 

@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using RouteService.Api.Endpoints;
 using RouteService.Application.Interfaces;
 using RouteService.Infrastructure;
+using Shared.Extensions;
 using Shared.Middelware;
+using Shared.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IRouteService, RouteService.Application.Services.RouteService>();
 builder.Services.Configure<GatewaySettings>(options =>
     options.AllowedGateways = builder.Configuration.GetSection("AllowedGateways").Get<string[]>() ?? Array.Empty<string>());
+builder.Services.AddTrackPakAuthenticationAndAuthorization(builder.Configuration);
+builder.Services.AddSingleton<IAuthorizationHandler, RoleHandler>();
 
 var app = builder.Build();
 

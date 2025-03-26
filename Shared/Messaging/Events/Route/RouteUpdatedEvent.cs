@@ -1,5 +1,6 @@
 using Monitoring;
 using Shared.Enums;
+using Shared.Monitoring;
 
 namespace Shared.Messaging.Events.Route;
 

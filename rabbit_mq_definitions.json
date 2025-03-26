@@ -1,0 +1,53 @@
+{
+  "rabbit_version": "latest",
+  "users": [],
+  "vhosts": [{"name": "/"}],
+  "permissions": [],
+  "parameters": [],
+  "policies": [],
+  "queues": [
+    {
+      "name": "main-queue",
+      "vhost": "/",
+      "durable": true,
+      "arguments": {
+        "x-dead-letter-exchange": "dlx-exchange",
+        "x-dead-letter-routing-key": "dlq-routing-key"
+      }
+    },
+    {
+      "name": "my-dead-letter-queue",
+      "vhost": "/",
+      "durable": true,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "main-exchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true
+    },
+    {
+      "name": "dlx-exchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true
+    }
+  ],
+  "bindings": [
+    {
+      "source": "main-exchange",
+      "destination": "main-queue",
+      "destination_type": "queue",
+      "routing_key": "main-routing-key"
+    },
+    {
+      "source": "dlx-exchange",
+      "destination": "my-dead-letter-queue",
+      "destination_type": "queue",
+      "routing_key": "dlq-routing-key"
+    }
+  ]
+}

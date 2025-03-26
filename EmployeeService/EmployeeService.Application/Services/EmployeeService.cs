@@ -109,7 +109,7 @@ public class EmployeeService : IEmployeeService
     await _employeeRepo.DeleteByIdAsync(employeeId);
   }
 
-  public async Task CreateEmployeeAsync(CreateEmployeeModel employeeModel)
+  public async Task<Guid> CreateEmployeeAsync(CreateEmployeeModel employeeModel)
   {
     // TODO:
     // await CheckIfUserExistWithEmail(userModel.Email, cancellationToken);
@@ -130,7 +130,7 @@ public class EmployeeService : IEmployeeService
     };
     
     await _employeeRepo.AddAsync(emp);
+    
+    return emp.Id;
   }
-
- 
 }

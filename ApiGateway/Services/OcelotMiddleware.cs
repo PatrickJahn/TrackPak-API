@@ -17,12 +17,18 @@ namespace ApiGateway.Services
         {
       
         
-            if (context?.User?.Identity?.IsAuthenticated == true)
+            if (context.User.Identity?.IsAuthenticated == true)
             {
-                var userId = context.User.Claims.FirstOrDefault(c => c.Type.Contains("user_id", StringComparison.InvariantCulture))?.Value;
-                var companyId = context.User.Claims.FirstOrDefault(c =>c.Type.Contains("company_id", StringComparison.InvariantCulture))?.Value;
-           
-                _logger.LogInformation($"UserId: {userId}, CompanyId: {companyId}");
+                var userId = context.User.Claims
+                    .FirstOrDefault(c => c.Type == "https://trackpak.dk/user_id")?.Value;
+
+                var companyId = context.User.Claims
+                    .FirstOrDefault(c => c.Type == "https://trackpak.dk/company_id")?.Value;
+
+                var role = context.User.Claims
+                    .FirstOrDefault(c => c.Type == "https://trackpak.dk/role")?.Value;
+
+                _logger.LogInformation($"UserId: {userId}, CompanyId: {companyId}, Role: {role}");
                 
                 if (!string.IsNullOrEmpty(userId))
                 {
@@ -31,6 +37,10 @@ namespace ApiGateway.Services
                 if (!string.IsNullOrEmpty(companyId))
                 {
                     context.Request.Headers["X-Company-Id"] = companyId;
+                }
+                if (!string.IsNullOrEmpty(role))
+                {
+                    context.Request.Headers["X-Role"] = role;
                 }
             }
 

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 
-namespace ApiGateway.Security.Roles;
+namespace Shared.Security;
 
 public class RoleRequirement(IEnumerable<string> roles) : IAuthorizationRequirement
 {

@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Monitoring;
 using Shared.Messaging.Topics;
+using Shared.Monitoring;
 
 namespace Shared.Messaging;
 

@@ -1,11 +1,6 @@
-using System.Diagnostics;
-using System.Text.Json;
-using ApiGateway.Security.Roles;
 using ApiGateway.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using Monitoring;
 using Ocelot.Authorization;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
@@ -14,9 +9,7 @@ using Shared.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load Ocelot configuration
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
-// Add authentication with Auth0
 builder.Services.AddAuthentication(o =>
     {
         o.DefaultAuthenticateScheme = "Auth0";
@@ -40,8 +33,6 @@ builder.Services.AddAuthentication(o =>
             RoleClaimType = "permissions"
             
         };
-        
-       
         
     });
 var auth0Namespace = builder.Configuration["Auth0:Namespace"];
@@ -69,7 +60,6 @@ builder.Services.AddSingleton<IAuthorizationHandler, RoleHandler>();
 
 builder.Services.AddScoped<IUserContextService, UserContextService>(); 
 
-// Add CORS service BEFORE using it
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -77,7 +67,7 @@ builder.Services.AddCors(options =>
 });
 
 // Add Ocelot
-builder.Services.AddOcelot(builder.Configuration).AddDelegatingHandler<CustomPermissionsAuthorizer>(); // ✅ Ensure Ocelot calls our custom authorizer;
+builder.Services.AddOcelot(builder.Configuration).AddDelegatingHandler<CustomPermissionsAuthorizer>(); 
 
 var app = builder.Build();
 

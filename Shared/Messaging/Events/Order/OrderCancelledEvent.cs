@@ -1,5 +1,6 @@
 using Monitoring;
 using Shared.Models;
+using Shared.Monitoring;
 
 namespace Shared.Messaging.Events.Order;
 

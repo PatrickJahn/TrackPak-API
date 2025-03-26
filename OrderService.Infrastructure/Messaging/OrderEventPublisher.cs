@@ -21,4 +21,15 @@ public class OrderEventPublisher(IMessageBus messageBus) : IOrderEventPublisher
 
         await messageBus.PublishAsync(MessageTopic.OrderCreated, userCreatedEvent);
     }
+    public async Task PublishCompanyOrdersAsync(Guid companyId, IEnumerable<Order> orders)
+    {
+        var companyOrdersEvent = new CompanyOrdersFetchedEvent
+        {
+            CompanyId = companyId,
+            OrderIds = orders.Select(o => o.Id).ToList()
+        };
+
+        await messageBus.PublishAsync(MessageTopic.CompanyOrdersFetched, companyOrdersEvent);
+    }
+
 }

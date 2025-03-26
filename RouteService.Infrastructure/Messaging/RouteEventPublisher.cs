@@ -3,6 +3,7 @@ using RouteService.Domain.Entities;
 using RouteService.Infrastructure.Messaging.Events;
 using Shared.Enums;
 using Shared.Messaging;
+using Shared.Messaging.Events.Order;
 using Shared.Messaging.Events.Route;
 using Shared.Messaging.Topics;
 
@@ -63,4 +64,14 @@ public class RouteEventPublisher(IMessageBus messageBus) : IRouteEventPublisher
 
         await messageBus.PublishAsync(MessageTopic.RouteDelayed,eventMessage);
     }
+
+    public async Task PublishFetchCompanyOrdersAsync(Guid companyId)
+    {
+        var fetchEvent = new FetchCompanyOrdersEvent
+        {
+            CompanyId = companyId
+        };
+        await messageBus.PublishAsync(MessageTopic.FetchCompanyOrders, fetchEvent);
+    }
+
 }

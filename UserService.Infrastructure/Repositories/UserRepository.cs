@@ -18,6 +18,5 @@ public class UserRepository(UserDbContext dbContext) : BaseRepository<User, User
     {
         IQueryable<User> query = _dbContext.Set<User>();
         return await query.FirstOrDefaultAsync(e => e.PhoneNumber == phone, cancellationToken);
-        
     }
 }

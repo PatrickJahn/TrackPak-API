@@ -22,5 +22,5 @@ public interface IEmployeeService
 
   public Task DeleteEmployeeAsync(Guid employeeId);
 
-  public Task CreateEmployeeAsync(CreateEmployeeModel employeeModel);
+  public Task<Guid> CreateEmployeeAsync(CreateEmployeeModel employeeModel);
 }

@@ -1,4 +1,4 @@
-namespace ApiGateway.Security.Roles;
+namespace Shared.Security;
 
 public static class RoleAsString
 {

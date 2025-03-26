@@ -4,24 +4,48 @@ using OrderService.Application.Models;
 using OrderService.Domain.Entities;
 using OrderService.Domain.Enums;
 using Shared.Extensions;
+using Shared.Security;
 
 namespace OrderService.Api.Endpoints;
 
 public static class OrderEndpoints
 {
     public static void MapOrderEndpoints(this IEndpointRouteBuilder app)
-    {
-        var group = app.MapGroup("/orders");
-
-        group.MapPost("/", CreateOrderAsync);
-        group.MapGet("/{orderId:guid}", GetOrderByIdAsync);
-        group.MapGet("/", GetOrdersAsync);
-        group.MapGet("/my-orders", GetMyOrdersAsync);
-        group.MapPut("/{orderId:guid}", UpdateOrderAsync);
-        group.MapDelete("/{orderId:guid}", DeleteOrderAsync);
-        group.MapPatch("/{orderId:guid}/status", UpdateOrderStatusAsync);
-        group.MapPost("/{orderId:guid}/cancel", CancelOrderAsync);
-    }
+       {
+           var group = app.MapGroup("/orders");
+   
+           // Requires either CompanyAdmin or SystemAdmin to create orders
+           group.MapPost("/", CreateOrderAsync)
+               .RequireAuthorization(PolicyRoles.CompanyAdmin);
+   
+           // SystemAdmin or CompanyAdmin can read any order
+           group.MapGet("/{orderId:guid}", GetOrderByIdAsync)
+               .RequireAuthorization(PolicyRoles.CompanyAdmin);
+   
+           // CompanyAdmin can view all orders
+           group.MapGet("/", GetOrdersAsync)
+               .RequireAuthorization(PolicyRoles.CompanyAdmin);
+   
+           // Customers can view their own orders
+           group.MapGet("/my-orders", GetMyOrdersAsync)
+               .RequireAuthorization(PolicyRoles.Customer);
+   
+           // Updating an order is restricted to CompanyAdmin or SystemAdmin
+           group.MapPut("/{orderId:guid}", UpdateOrderAsync)
+               .RequireAuthorization(PolicyRoles.CompanyAdmin);
+   
+           // Deleting an order is restricted to SystemAdmin only
+           group.MapDelete("/{orderId:guid}", DeleteOrderAsync)
+               .RequireAuthorization(PolicyRoles.SystemAdmin);
+   
+           // Updating order status is restricted to CompanyAdmin or SystemAdmin
+           group.MapPatch("/{orderId:guid}/status", UpdateOrderStatusAsync)
+               .RequireAuthorization(PolicyRoles.CompanyAdmin);
+   
+           // Canceling order is allowed for Customers
+           group.MapPost("/{orderId:guid}/cancel", CancelOrderAsync)
+               .RequireAuthorization(PolicyRoles.Customer);
+       }
 
     private static async Task<Results<Created<Order>, BadRequest<string>>> CreateOrderAsync(
         CreateOrderModel order,

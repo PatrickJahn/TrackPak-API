@@ -22,12 +22,12 @@ namespace Shared.Middelware
             var requestOrigin = context.Request.Headers["X-Forwarded-Host"].FirstOrDefault() ??
                                 context.Request.Headers["Host"].ToString(); // Fallback
 
-            _logger.LogInformation("🌍 Incoming request from: {RequestOrigin}", requestOrigin);
+            _logger.LogInformation("Incoming request from: {RequestOrigin}", requestOrigin);
 
             // Validate the request comes from an allowed gateway
             if (string.IsNullOrEmpty(requestOrigin) || !_allowedGateways.Any(gateway => requestOrigin.Contains(gateway)))
             {
-                _logger.LogWarning("❌ Access denied. Origin: {RequestOrigin}", requestOrigin);
+                _logger.LogWarning("Access denied. Origin: {RequestOrigin}", requestOrigin);
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
                 await context.Response.WriteAsync($"Access denied. Requests must come through API Gateway. Allowed: {string.Join(", ", _allowedGateways)}");
                 return;

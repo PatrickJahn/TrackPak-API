@@ -3,6 +3,7 @@ using CompanyService.Application.Interfaces;
 using CompanyService.Application.Models;
 using CompanyService.Domain.Entities;
 using Shared.Extensions;
+using Shared.Security;
 
 
 namespace CompanyService.Api.Endpoints;
@@ -13,13 +14,29 @@ public static class CompanyEndpoints
     {
         var group = app.MapGroup("/company");
 
-        group.MapPost("/", CreateCompanyAsync);
-        group.MapGet("/{companyId}", GetCompanyByIdAsync);
-        group.MapGet("/me", GetMeAsync);
+        // Only SystemAdmin can create companies
+        group.MapPost("/", CreateCompanyAsync)
+            .RequireAuthorization("RequireWriteReadCompanies");
 
-        group.MapGet("/", GetCompaniesAsync);
-        group.MapPut("/{companyId}", UpdateCompanyAsync);
-        group.MapDelete("/{companyId}", DeleteCompanyAsync);
+        // CompanyAdmin or SystemAdmin can fetch company by ID
+        group.MapGet("/{companyId:guid}", GetCompanyByIdAsync)
+            .RequireAuthorization(PolicyRoles.CompanyAdmin);
+
+        // CompanyAdmin or SystemAdmin can fetch their own company
+        group.MapGet("/me", GetMeAsync)
+            .RequireAuthorization(PolicyRoles.SystemAdmin);
+
+        // Only SystemAdmin can fetch all companies
+        group.MapGet("/", GetCompaniesAsync)
+            .RequireAuthorization(PolicyRoles.SystemAdmin);
+
+        // CompanyAdmin can update their company
+        group.MapPut("/{companyId:guid}", UpdateCompanyAsync)
+            .RequireAuthorization(PolicyRoles.CompanyAdmin);
+
+        // Only SystemAdmin can delete companies
+        group.MapDelete("/{companyId:guid}", DeleteCompanyAsync)
+            .RequireAuthorization(PolicyRoles.SystemAdmin);
     }
 
     private static async Task<IResult> CreateCompanyAsync(
@@ -34,8 +51,8 @@ public static class CompanyEndpoints
     {
         var companyId = httpContext.GetCompanyId();
         
-        if (companyId is null)
-            return Results.Unauthorized();
+        //if (companyId is null)
+          //  return Results.Unauthorized();
         
         var company = await service.GetCompanyByIdAsync((Guid) companyId, cancellationToken);
         return Results.Ok(company);

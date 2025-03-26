@@ -14,7 +14,9 @@
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
-        "X-Company-Id": "{claims.company_id}"
+        "X-Company-Id": "{claims.company_id}",
+        "X-Employee-Id": "{claims.employee_id}",
+        "X-Role": "{claims.role}"
       }
     },
     {
@@ -31,7 +33,9 @@
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
-        "X-Company-Id": "{claims.company_id}"
+        "X-Company-Id": "{claims.company_id}",
+        "X-Employee-Id": "{claims.employee_id}",
+        "X-Role": "{claims.role}"
       }
     },
     {
@@ -48,7 +52,9 @@
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
-        "X-Company-Id": "{claims.company_id}"
+        "X-Company-Id": "{claims.company_id}",
+        "X-Employee-Id": "{claims.employee_id}",
+        "X-Role": "{claims.role}"
       }
     },
     {
@@ -65,7 +71,7 @@
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
-        "X-Company-Id": "{claims.company_id}"
+        "X-Role": "{claims.role}"
       }
     },
     {
@@ -81,7 +87,9 @@
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
-        "X-Company-Id": "{claims.company_id}"
+        "X-Company-Id": "{claims.company_id}",
+        "X-Employee-Id": "{claims.employee_id}",
+        "X-Role": "{claims.role}"
       }
     },
     {
@@ -98,7 +106,9 @@
       },
       "AddHeadersToRequest": {
         "X-User-Id": "{claims.user_id}",
-        "X-Company-Id": "{claims.company_id}"
+        "X-Company-Id": "{claims.company_id}",
+        "X-Employee-Id": "{claims.employee_id}",
+        "X-Role": "{claims.role}"
       }
     },
     {
