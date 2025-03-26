@@ -24,10 +24,10 @@ public static class EmployeeEndpoints
             .RequireAuthorization(PolicyRoles.CompanyAdmin);
 
         group.MapGet("/by-email/{email}", GetEmployeeByEmailAsync)
-            .RequireAuthorization("RequireWritReadeEmployees");
+            .RequireAuthorization("RequireWriteReadEmployees");
 
         group.MapPost("/", CreateEmployeeAsync)
-            .RequireAuthorization("RequireWritReadeEmployees");
+            .RequireAuthorization("RequireWriteReadEmployees");
 
         group.MapPut("/{id}", UpdateEmployeeAsync)
             .RequireAuthorization(PolicyRoles.CompanyAdmin);

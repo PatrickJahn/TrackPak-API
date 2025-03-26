@@ -1,7 +1,10 @@
 using LocationService.Api.Endpoints;
 using LocationService.Application;
 using LocationService.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
+using Shared.Extensions;
 using Shared.Middelware;
+using Shared.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.Configure<GatewaySettings>(options =>
     options.AllowedGateways = builder.Configuration.GetSection("AllowedGateways").Get<string[]>() ?? Array.Empty<string>());
+builder.Services.AddTrackPakAuthenticationAndAuthorization(builder.Configuration);
+builder.Services.AddSingleton<IAuthorizationHandler, RoleHandler>();
 
 var app = builder.Build();
 

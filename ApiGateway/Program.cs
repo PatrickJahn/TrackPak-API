@@ -1,4 +1,3 @@
-using ApiGateway.Security.Roles;
 using ApiGateway.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -10,9 +9,7 @@ using Shared.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load Ocelot configuration
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
-// Add authentication with Auth0
 builder.Services.AddAuthentication(o =>
     {
         o.DefaultAuthenticateScheme = "Auth0";
@@ -63,7 +60,6 @@ builder.Services.AddSingleton<IAuthorizationHandler, RoleHandler>();
 
 builder.Services.AddScoped<IUserContextService, UserContextService>(); 
 
-// Add CORS service BEFORE using it
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",

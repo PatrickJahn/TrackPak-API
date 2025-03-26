@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
-using Shared.Security;
+using Microsoft.Extensions.Configuration;
 
-namespace ApiGateway.Security.Roles;
+namespace Shared.Security;
 
 public class RoleHandler(IConfiguration configuration) : AuthorizationHandler<RoleRequirement>
 {

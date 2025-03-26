@@ -1,6 +1,6 @@
-
 using RouteService.Application.Interfaces;
 using Shared.Extensions;
+using Shared.Security;
 
 namespace RouteService.Api.Endpoints
 {
@@ -13,29 +13,30 @@ namespace RouteService.Api.Endpoints
             {
                 var route = await service.GetRoutesByEmployeeIdAsync(id);
                 return route is not null ? Results.Ok(route) : Results.NotFound();
-            });
+            }).RequireAuthorization(PolicyRoles.CompanyAdmin);
 
             //  Get All Routes for a Specific Employee
             app.MapGet("/route/employee/routes", async (HttpContext httpContext, IRouteService service) =>
             {
                 var employeeId = httpContext.GetEmployeeId() ?? Guid.Empty;
-
                 var routes = await service.GetRoutesByEmployeeIdAsync(employeeId);
                 return Results.Ok(routes);
-            });
+            }).RequireAuthorization(PolicyRoles.Driver);
+
             //  Get All Routes for a Specific Company
             app.MapGet("/route/company/routes", async (HttpContext httpContext, IRouteService service) =>
             {
                 var companyId = httpContext.GetCompanyId() ?? Guid.Empty;
                 var routes = await service.GetRoutesByEmployeeIdAsync(companyId);
                 return Results.Ok(routes);
-            });
+            }).RequireAuthorization(PolicyRoles.CompanyAdmin);
+
             //  Mark Route as Completed
             app.MapPost("route/{id:guid}/complete", async (Guid id, IRouteService service) =>
             {
                 var route = await service.MarkRouteAsCompletedAsync(id);
                 return route is not null ? Results.Ok(route) : Results.NotFound();
-            });
+            }).RequireAuthorization(PolicyRoles.Driver);
 
             //  Optimize Route
             app.MapPost("route/{id:guid}/optimize", async (Guid id, IRouteService service) =>
@@ -49,7 +50,7 @@ namespace RouteService.Api.Endpoints
                 {
                     return Results.Problem($"Optimization failed: {ex.Message}");
                 }
-            });
+            }).RequireAuthorization(PolicyRoles.CompanyAdmin);
 
             //  Delete Route by ID
             app.MapDelete("route/{id:guid}", async (Guid id, IRouteService service) =>
@@ -62,9 +63,9 @@ namespace RouteService.Api.Endpoints
 
                 await service.MarkRouteAsCompletedAsync(id);
                 return Results.Ok($"Route {id} deleted successfully.");
-            });
-            
-            // ✅ Generate Routes for a Company
+            }).RequireAuthorization(PolicyRoles.CompanyAdmin);
+
+            // Generate Routes for a Company
             app.MapPost("/route/company/generate", async (HttpContext httpContext, IRouteService service) =>
             {
                 var companyId = httpContext.GetCompanyId();
@@ -82,10 +83,7 @@ namespace RouteService.Api.Endpoints
                 {
                     return Results.Problem($"Failed to generate routes: {ex.Message}");
                 }
-            });
-
+            }).RequireAuthorization(PolicyRoles.CompanyAdmin);
         }
-        
-        
     }
 }

@@ -1,11 +1,14 @@
 
 
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authorization;
 using OrderService.Api.Endpoints;
 using OrderService.Application;
 using OrderService.Application.Interfaces;
 using OrderService.Infrastructure;
+using Shared.Extensions;
 using Shared.Middelware;
+using Shared.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +26,8 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 builder.Services.Configure<GatewaySettings>(options =>
     options.AllowedGateways = builder.Configuration.GetSection("AllowedGateways").Get<string[]>() ?? Array.Empty<string>());
 
+builder.Services.AddTrackPakAuthenticationAndAuthorization(builder.Configuration);
+builder.Services.AddSingleton<IAuthorizationHandler, RoleHandler>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

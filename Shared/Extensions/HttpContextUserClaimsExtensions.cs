@@ -36,7 +36,7 @@ public static class HttpContextUserClaimsExtensions
     /// </summary>
     public static Guid? GetEmployeeId(this HttpContext httpContext)
     {
-        if (httpContext.Request.Headers.TryGetValue("X-Employee_Id", out var employeeIdString) &&
+        if (httpContext.Request.Headers.TryGetValue("X-Employee-Id", out var employeeIdString) &&
             Guid.TryParse(employeeIdString, out var employeeId))
         {
             return employeeId;
@@ -44,35 +44,24 @@ public static class HttpContextUserClaimsExtensions
         return null; // Return null if not found or invalid
     }
     /// <summary>
-    /// Retrieves all roles from the request headers (comma-separated).
+    /// Retrieves the single role from the request headers.
     /// </summary>
-    public static List<string> GetRoles(this HttpContext httpContext)
+    public static string? GetRole(this HttpContext httpContext)
     {
-        if (httpContext.Request.Headers.TryGetValue("X-Roles", out var rolesString))
+        if (httpContext.Request.Headers.TryGetValue("X-Role", out var role))
         {
-            return rolesString
-                .ToString()
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .ToList();
+            return role.ToString().Trim();
         }
 
-        return new List<string>(); // Return empty list if not found
+        return null;
     }
 
     /// <summary>
-    /// Helper to check if the user has a specific role.
+    /// Checks if the user has the required role.
     /// </summary>
-    public static bool HasRole(this HttpContext httpContext, string role)
+    public static bool HasRole(this HttpContext httpContext, string requiredRole)
     {
-        var roles = httpContext.GetRoles();
-        return roles.Contains(role, StringComparer.OrdinalIgnoreCase);
-    }
-    
-    public static class RoleAsString
-    {
-        public const string Customer = "Customer";
-        public const string CompanyAdmin = "CompanyAdmin"; 
-        public const string Driver = "Driver"; 
-        public const string SystemAdmin = "SystemAdmin";
+        var role = httpContext.GetRole();
+        return string.Equals(role, requiredRole, StringComparison.OrdinalIgnoreCase);
     }
 }
